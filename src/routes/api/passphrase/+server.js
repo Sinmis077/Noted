@@ -10,7 +10,7 @@ export async function POST({ request, cookies }) {
 	cookies.set('passphrase', passphrase, {
 		path: '/',
 		httpOnly: true,
-		secure: false,
+		secure: true,
 		sameSite: 'strict',
 		maxAge: 60 * 60 * 24 * 30
 	});
