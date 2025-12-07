@@ -1,0 +1,51 @@
+# --- Node ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- SvelteKit / Vite ---
+.svelte-kit/
+.svelte-kit/types/*
+dist/
+build/
+.vite/
+
+# --- Environment files ---
+.env
+.env.*
+!.env.example
+
+# --- SQLite database files ---
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+
+# --- WebStorm / JetBrains IDE ---
+.idea/
+*.iml
+out/
+
+# --- Docker ---
+# Ignore local Docker build cache or artifacts
+.docker/
+docker-cache/
+*.tar
+
+# If you build dev images locally and export them:
+*.img
+*.dockerfile-backup
+
+# --- OS/Editor junk ---
+.DS_Store
+.vscode/
+Thumbs.db
+
+# --- Logs ---
+logs/
+*.log
+/notes-dev.db-wal
+/notes-dev.db-shm
