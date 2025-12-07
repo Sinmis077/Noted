@@ -1,7 +1,7 @@
 {
-	"name": "todo-notes",
+	"name": "noted",
 	"private": true,
-	"version": "0.0.1",
+	"version": "1.0.0 (SnapDragon)",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
