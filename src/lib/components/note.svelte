@@ -72,7 +72,7 @@
 		<CardAction>
 			<div class="flex flex-row gap-2">
 				{#if note.isCompleted}
-					<SquareCheck class="cursor-pointer text-green-500" onclick={handleMarkComplete} />
+					<SquareCheck class="cursor-pointer dark:text-green-200 text-green-600" onclick={handleMarkComplete} />
 				{:else}
 					<Square class="cursor-pointer" onclick={handleMarkComplete} />
 				{/if}
@@ -110,12 +110,12 @@
 			{formatDate(note.createdAt)}
 		</p>
 		{#if note.isCompleted}
-			<p class="text-green-600 w-full">Completed: {formatDate(note.completedAt)}</p>
+			<p class="dark:text-green-200 text-green-600 w-full">Completed: {formatDate(note.completedAt)}</p>
 		{/if}
 
 		<AlertDialog>
 			<AlertDialogTrigger
-				class="cursor-pointer bg-red-600 hover:bg-red-700 transition-colors font-bold ms-auto p-2 rounded text-white"
+				class="cursor-pointer dark:bg-rose-500 dark:hover:bg-rose-700 bg-red-600 hover:bg-red-700 transition-colors font-bold ms-auto p-2 rounded text-white"
 			>
 				<Trash2 class="text-white" />
 			</AlertDialogTrigger>
