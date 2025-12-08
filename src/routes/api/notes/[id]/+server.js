@@ -1,5 +1,5 @@
 import { error, json } from '@sveltejs/kit';
-import { deleteNote, saveNote } from '$lib/server/database.js';
+import { deleteNote, saveNote } from '$lib/server/notes_repository.js';
 
 export async function PUT({ params, request, cookies }) {
 	const passphrase = cookies.get('passphrase');

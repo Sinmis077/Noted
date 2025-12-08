@@ -2,12 +2,13 @@ import Database from 'better-sqlite3';
 import { dev } from '$app/environment';
 import { mkdirSync } from 'fs';
 import { dirname } from 'path';
+import migrate from '$lib/server/database_migration.js';
 
 const dbPath = dev ? 'notes-dev.db' : '/app/data/notes.db';
 
 let db;
 
-function getDB() {
+export function getDB() {
 	if (!db) {
 		// Create directory if needed
 		const dir = dirname(dbPath);
@@ -16,10 +17,12 @@ function getDB() {
 		}
 
 		db = new Database(dbPath, {
-			verbose: dev ? console.log : undefined
+			// verbose: dev ? console.log : undefined
 		});
 
 		db.pragma('journal_mode = WAL');
+		db.pragma('user_version = 1');
+
 		initializeDB();
 	}
 	return db;
@@ -40,106 +43,15 @@ function initializeDB() {
 			UNIQUE(passphrase, id)
 		);
 
+		CREATE TABLE IF NOT EXISTS migrations (
+			label TEXT PRIMARY KEY,
+			run_at TEXT DEFAULT CURRENT_TIMESTAMP
+		);
+	
 		CREATE INDEX IF NOT EXISTS idx_passphrase ON notes(passphrase);		
 		`);
+
+	migrate(database);
 }
 
-export function getNotesByPassphrase(passphrase) {
-	const db = getDB();
-	const stmt = db.prepare(`
-	SELECT
-		id,
-		text,
-		backgroundColor,
-		isCompleted,
-		createdAt,
-		completedAt,
-		note_order as "order"
-	FROM notes
-	WHERE passphrase = ?
-	ORDER BY note_order ASC;
-`);
-
-	const rows = stmt.all(passphrase);
-
-	return rows.map((row) => ({
-		...row,
-		isCompleted: Boolean(row.isCompleted)
-	}));
-}
-
-export function saveNote(passphrase, note) {
-	const db = getDB();
-	const stmt = db.prepare(`
-		INSERT INTO notes (id,
-											 passphrase, text, backgroundColor, isCompleted,
-											 createdAt, completedAt, note_order)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (passphrase, id) DO
-		UPDATE SET
-			text = excluded.text,
-			backgroundColor = excluded.backgroundColor,
-			isCompleted = excluded.isCompleted,
-			completedAt = excluded.completedAt,
-			note_order = excluded.note_order 
-		RETURNING 
-			id,
-			text,
-			backgroundColor,
-			isCompleted,
-			createdAt,
-			completedAt,
-			note_order as "order";
-	`);
-
-	let dbNote = stmt.get(
-		note.id,
-		passphrase,
-		note.text,
-		note.backgroundColor,
-		note.isCompleted ? 1 : 0,
-		note.createdAt,
-		note.completedAt,
-		note.order
-	);
-
-	return {
-		...dbNote,
-		isCompleted: Boolean(dbNote.isCompleted)
-	};
-}
-
-export function deleteNote(passphrase, noteId) {
-	const db = getDB();
-	const stmt = db.prepare(`
-		DELETE
-		FROM notes
-		WHERE passphrase = ?
-			AND id = ?
-	`);
-
-	const result = stmt.run(passphrase, noteId);
-	return result.changes > 0;
-}
-
-export function deleteNotes(passphrase) {
-	const db = getDB();
-	const stmt = db.prepare(`
-	DELETE FROM notes
-	WHERE passphrase = ?
-	`);
-
-	const result = stmt.run(passphrase);
-	return result.changes > 0;
-}
-
-export function passphraseExists(passphrase) {
-	const db = getDB();
-	const stmt = db.prepare(`
-		SELECT COUNT(*) as count
-		FROM notes
-		WHERE passphrase = ?
-	`);
-
-	const result = stmt.get(passphrase);
-	return result.count > 0;
-}
+export default db;
