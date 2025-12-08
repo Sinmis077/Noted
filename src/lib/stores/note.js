@@ -15,8 +15,8 @@ const COLORS = [
 	'bg-blue-200 dark:bg-blue-600',
 	'bg-indigo-200 dark:bg-indigo-600',
 	'bg-violet-200 dark:bg-violet-600',
-	'bg-purple-200 dark:bg-purple-600',
-	'bg-fuchsia-200 dark:bg-fuchsia-600',
+	'bg-purple-200 dark:bg-purple-700',
+	'bg-fuchsia-200 dark:bg-fuchsia-700',
 	'bg-pink-200 dark:bg-pink-600',
 ];
 

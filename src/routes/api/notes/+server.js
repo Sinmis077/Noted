@@ -1,5 +1,5 @@
 import { error, json } from '@sveltejs/kit';
-import { deleteNotes, getNotesByPassphrase, saveNote } from '$lib/server/database.js';
+import { deleteNotes, getNotesByPassphrase, saveNote } from '$lib/server/notes_repository.js';
 
 export async function GET({ cookies }) {
 	const passphrase = cookies.get('passphrase');
