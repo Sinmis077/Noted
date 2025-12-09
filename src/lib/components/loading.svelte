@@ -5,7 +5,7 @@
 	let { description } = $props();
 </script>
 
-<div class="container mx-auto h-screen flex flex-col justify-center items-center">
+<div class="container mx-auto flex flex-col justify-center items-center">
 	<Empty>
 		<EmptyHeader>
 			<EmptyMedia variant="icon">

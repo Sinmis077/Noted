@@ -5,6 +5,7 @@
 	import { onMount } from 'svelte';
 
 	let isLoading = false;
+	let error = null;
 
 	onMount(async () => {
 		isLoading = true;
@@ -12,7 +13,7 @@
 		try {
 			await notes.loadNotes();
 		} catch (err) {
-			// Future toasts:tm:
+			error = err;
 		} finally {
 			isLoading = false;
 		}
@@ -20,7 +21,12 @@
 </script>
 
 {#if isLoading}
-	<Loading description="Loading notes..." />
+	<Loading class="h-full" description="Loading notes..." />
+{:else if error}
+	Failed to load your notes... <br/>
+	<p class="text-red-500">
+		{error}
+	</p>
 {:else}
 	<div>
 		{#if $notes.length > 0}
