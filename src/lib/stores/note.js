@@ -2,22 +2,14 @@ import { writable } from 'svelte/store';
 import { api } from '$lib/utils/api.js';
 
 const COLORS = [
-	'bg-red-200 dark:bg-red-600',
-	'bg-amber-200 dark:bg-amber-600',
-	'bg-orange-200 dark:bg-orange-600',
-	'bg-yellow-200 dark:bg-yellow-600',
-	'bg-lime-200 dark:bg-lime-600',
-	'bg-green-200 dark:bg-green-600',
-	'bg-emerald-200 dark:bg-emerald-600',
-	'bg-teal-200 dark:bg-teal-600',
-	'bg-cyan-200 dark:bg-cyan-600',
-	'bg-sky-200 dark:bg-sky-600',
-	'bg-blue-200 dark:bg-blue-600',
-	'bg-indigo-200 dark:bg-indigo-600',
-	'bg-violet-200 dark:bg-violet-600',
-	'bg-purple-200 dark:bg-purple-700',
-	'bg-fuchsia-200 dark:bg-fuchsia-700',
-	'bg-pink-200 dark:bg-pink-600',
+	'bg-powder-blush',
+	'bg-apricot-cream',
+	'bg-cream',
+	'bg-tea-green',
+	'bg-electric-aqua',
+	'bg-baby-blue-ice',
+	'bg-periwinkle',
+	'bg-mauve',
 ];
 
 function generateId() {
