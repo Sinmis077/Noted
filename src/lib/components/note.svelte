@@ -24,6 +24,7 @@
 	import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '$lib/components/ui/tooltip/index.js';
 	import { toast } from 'svelte-sonner';
 	import { Spinner } from '$lib/components/ui/spinner/index.js';
+	import { Popover, PopoverContent, PopoverTrigger } from '$lib/components/ui/popover/index.js';
 
 	let { note } = $props();
 
@@ -162,22 +163,20 @@
 		{/if}
 	</CardContent>
 	<CardFooter class="flex flex-col gap-1 mt-auto">
-		<TooltipProvider>
-			<Tooltip>
-				<TooltipTrigger class="ms-auto size-4" asChild>
+		<Popover>
+				<PopoverTrigger class="ms-auto size-4" asChild>
 					{#if note.isCompleted}
 						<CircleCheck />
 					{:else}
 						<InfoIcon />
 					{/if}
-				</TooltipTrigger>
-				<TooltipContent>
+				</PopoverTrigger>
+				<PopoverContent>
 					Created on: {formatDate(note.createdAt)} <br />
 					{#if note.isCompleted}
 						Completed on: {formatDate(note.completedAt)}
 					{/if}
-				</TooltipContent>
-			</Tooltip>
-		</TooltipProvider>
+				</PopoverContent>
+		</Popover>
 	</CardFooter>
 </Card>

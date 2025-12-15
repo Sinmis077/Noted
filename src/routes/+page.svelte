@@ -5,9 +5,10 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import { toast } from 'svelte-sonner';
+	import { Spinner } from '$lib/components/ui/spinner/index.js';
 
 	let passphrase = '';
-	let error = '';
 	let isLoading = false;
 
 	function handleKeyDown(e) {
@@ -18,11 +19,10 @@
 
 	async function handlePassphraseSubmission() {
 		if (!passphrase.trim()) {
-			error = 'No passphrase found';
+			toast.error('No passphrase found');
 			return;
 		}
 
-		error = '';
 		isLoading = true;
 
 		try {
@@ -32,8 +32,8 @@
 
 			await goto(resolve('/notes'));
 		} catch (err) {
-			error = 'Failed to set passphrase, please try again';
-			throw err;
+			toast.error(err.message);
+			toast.error('Failed to set passphrase, please try again');
 		} finally {
 			isLoading = false;
 		}
@@ -56,7 +56,14 @@
 						placeholder="Enter your passphrase"
 					/>
 				</InputGroup>
-				<Button type="submit" class="mt-5" size="lg">Submit</Button>
+				<Button type="submit" class="mt-5" size="lg" disabled={isLoading}>
+					{#if isLoading}
+						<Spinner />
+						Processing...
+					{:else}
+						Submit
+					{/if}
+				</Button>
 			</form>
 		</CardContent>
 	</Card>
