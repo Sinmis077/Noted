@@ -10,7 +10,11 @@
 		AlertDialogTrigger
 	} from '$lib/components/ui/alert-dialog/index.js';
 	import { notes } from '$lib/stores/note.js';
-	import { InputGroup, InputGroupAddon, InputGroupButton } from '$lib/components/ui/input-group/index.js';
+	import {
+		InputGroup,
+		InputGroupAddon,
+		InputGroupButton
+	} from '$lib/components/ui/input-group/index.js';
 	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { api } from '$lib/utils/api.js';
@@ -19,6 +23,7 @@
 	import { toast } from 'svelte-sonner';
 	import { LogOut, Paintbrush } from 'lucide-svelte';
 	import { Spinner } from '$lib/components/ui/spinner/index.js';
+	import NoteDrawer from '$lib/components/note-drawer.svelte';
 
 	let newNoteText = $state('');
 
@@ -94,45 +99,48 @@
 		</InputGroup>
 	</form>
 
-	<div class="flex row gap-2 justify-end md:mt-0 mt-3">
-		<AlertDialog bind:open={isDialogOpen}>
-			<AlertDialogTrigger
-				class="cursor-pointer bg-red-700 hover:bg-red-800 transition-colors p-1 px-10 rounded-[8px] text-white"
-			>
-				<div class="flex flex-row items-center gap-2">
-					<Paintbrush size={16} />
-					Clear All
-				</div>
-			</AlertDialogTrigger>
-			<AlertDialogContent
-				onkeydown={(e) => {
-				if (e.key === 'Enter') {
-					handleClearAll();
-				}
-			}}
-			>
-				<AlertDialogHeader>Are you sure?</AlertDialogHeader>
-				<AlertDialogDescription>This action cannot be undone</AlertDialogDescription>
-				<AlertDialogFooter>
-					<AlertDialogCancel>Cancel</AlertDialogCancel>
-					<AlertDialogAction
-						class="bg-red-700 hover:bg-red-800 transition-colors"
-						onclick={handleClearAll}
-						disabled={isDeleting}
-					>
-						{#if isDeleting}
-							<Spinner size="icon" />
-							Processing
-						{:else}
-						<span class="text-white">Confirm</span>
-						{/if}
-					</AlertDialogAction>
-				</AlertDialogFooter>
-			</AlertDialogContent>
-		</AlertDialog>
-		<Button onclick={handleLeaveWorkspace} class="flex flex-row gap-2 items-center px-10">
-			<LogOut size={16} />
-			Leave workspace
-		</Button>
+	<div class="flex justify-between md:mt-0 mt-3">
+		<NoteDrawer />
+		<div class="flex gap-2">
+			<AlertDialog bind:open={isDialogOpen}>
+				<AlertDialogTrigger
+					class="cursor-pointer bg-red-700 hover:bg-red-800 transition-colors p-1 px-10 rounded-[8px] text-white"
+				>
+					<div class="flex flex-row items-center gap-2">
+						<Paintbrush size={16} />
+						Clear All
+					</div>
+				</AlertDialogTrigger>
+				<AlertDialogContent
+					onkeydown={(e) => {
+						if (e.key === 'Enter') {
+							handleClearAll();
+						}
+					}}
+				>
+					<AlertDialogHeader>Are you sure?</AlertDialogHeader>
+					<AlertDialogDescription>This action cannot be undone</AlertDialogDescription>
+					<AlertDialogFooter>
+						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogAction
+							class="bg-red-700 hover:bg-red-800 transition-colors"
+							onclick={handleClearAll}
+							disabled={isDeleting}
+						>
+							{#if isDeleting}
+								<Spinner size="icon" />
+								Processing
+							{:else}
+								<span class="text-white">Confirm</span>
+							{/if}
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
+			<Button onclick={handleLeaveWorkspace} class="flex flex-row gap-2 items-center px-10">
+				<LogOut size={16} />
+				Leave workspace
+			</Button>
+		</div>
 	</div>
 </div>

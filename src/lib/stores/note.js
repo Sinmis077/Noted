@@ -28,7 +28,17 @@ function createNotesStore() {
 
 		loadNotes: async () => {
 			try {
-				const { data } = await api.get('/notes');
+				const { data } = await api.get('/notes', { params: { status: 'unfinished' } });
+				set(data);
+			} catch (err) {
+				set([]);
+				throw err;
+			}
+		},
+
+		loadFinishedNotes: async () => {
+			try {
+				const { data } = await api.get('/notes', { params: { status: 'finished' } });
 				set(data);
 			} catch (err) {
 				set([]);
