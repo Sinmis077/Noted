@@ -124,7 +124,7 @@
 							<Spinner size="icon" />
 							Processing
 						{:else}
-							Confirm
+						<span class="text-white">Confirm</span>
 						{/if}
 					</AlertDialogAction>
 				</AlertDialogFooter>
