@@ -13,7 +13,7 @@ export function getNotesByPassphrase(passphrase) {
 		note_order as "order"
 	FROM notes
 	WHERE passphrase = ?
-	ORDER BY note_order DESC;
+	ORDER BY note_order ASC;
 `);
 
 	const rows = stmt.all(passphrase);
