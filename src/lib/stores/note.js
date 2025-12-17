@@ -56,7 +56,7 @@ function createNotesStore() {
 			try {
 				const { data } = await api.post('/notes', newNote);
 
-				update((notes) => [data, ...notes]);
+				update((notes) => [...notes, data]);
 			} catch (err) {
 				throw err;
 			}
