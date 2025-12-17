@@ -1,23 +1,15 @@
 import { error, json } from '@sveltejs/kit';
 import { deleteNotes, getNotesByPassphrase, saveNote, getFinishedNotesByPassphrase } from '$lib/server/notes_repository.js';
 
-export async function GET({ cookies, url }) {
+export async function GET({ cookies }) {
 	const passphrase = cookies.get('passphrase');
-	const noteStatus = url.searchParams.get('status');
 
 	if (!passphrase) {
 		return json([]);
 	}
 
 	try {
-		let notes;
-		console.log(noteStatus)
-
-		if (noteStatus === 'unfinished') {
-			notes = getNotesByPassphrase(passphrase);
-		} else if (noteStatus === 'finished') {
-			notes = getFinishedNotesByPassphrase(passphrase);
-		}
+		let notes = getNotesByPassphrase(passphrase);
 
 		return json(notes);
 	} catch (err) {

@@ -12,7 +12,7 @@ export function getNotesByPassphrase(passphrase) {
 		completedAt,
 		note_order as "order"
 	FROM notes
-	WHERE passphrase = ? AND isCompleted = 0
+	WHERE passphrase = ?
 	ORDER BY note_order DESC;
 `);
 
@@ -22,23 +22,6 @@ export function getNotesByPassphrase(passphrase) {
 		...row,
 		isCompleted: Boolean(row.isCompleted)
 	}));
-}
-
-export function getFinishedNotesByPassphrase(passphrase){
-	const db = getDB();
-	const stmt = db.prepare(`
-		SELECT
-		id,
-		text,
-		backgroundColor,
-		isCompleted,
-		createdAt,
-		completedAt,
-		note_order as "order"
-	FROM notes
-	WHERE passphrase = ? AND isCompleted = 1
-	ORDER BY note_order DESC;
-		`)
 }
 
 export function saveNote(passphrase, note) {
