@@ -1,5 +1,5 @@
 import { error, json } from '@sveltejs/kit';
-import { deleteNotes, getNotesByPassphrase, saveNote, getFinishedNotesByPassphrase } from '$lib/server/notes_repository.js';
+import { deleteNotes, getNotesByPassphrase, saveNote } from '$lib/server/notes_repository.js';
 
 export async function GET({ cookies }) {
 	const passphrase = cookies.get('passphrase');
@@ -13,7 +13,7 @@ export async function GET({ cookies }) {
 
 		return json(notes);
 	} catch (err) {
-		throw error(500, 'Failed to get notes from the database');
+		throw error(500, 'Failed to get notes from the database: ' + err.message);
 	}
 }
 
