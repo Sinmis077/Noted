@@ -45,6 +45,7 @@
 		"better-sqlite3": "^12.5.0",
 		"bits-ui": "^2.14.4",
 		"lucide-svelte": "^0.556.0",
-		"mode-watcher": "^1.1.0"
+		"mode-watcher": "^1.1.0",
+		"svelte-bricks": "^0.3.2"
 	}
 }

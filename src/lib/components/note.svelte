@@ -8,18 +8,9 @@
 		AlertDialogContent,
 		AlertDialogDescription,
 		AlertDialogFooter,
-		AlertDialogHeader,
-		AlertDialogTrigger
+		AlertDialogHeader
 	} from '$lib/components/ui/alert-dialog/index.js';
-	import {
-		CircleCheck,
-		Eraser,
-		InfoIcon,
-		Pen,
-		Square,
-		SquareCheck,
-		TextAlignJustify
-	} from 'lucide-svelte';
+	import { CircleCheck, Eraser, InfoIcon, Pen, Square, SquareCheck, TextAlignJustify } from 'lucide-svelte';
 	import { InputGroup, InputGroupAddon, InputGroupButton } from '$lib/components/ui/input-group/index.js';
 	import { toast } from 'svelte-sonner';
 	import { Spinner } from '$lib/components/ui/spinner/index.js';
@@ -31,6 +22,8 @@
 	let isDeleting = $state(false);
 	let isChecking = $state(false);
 	let editingNoteText = $derived(note.text);
+
+	let isDeletingAlertOpen = $state(false);
 
 	async function handleMarkComplete() {
 		isChecking = true;
@@ -92,7 +85,7 @@
 	}
 </script>
 
-<Card class="aspect-square text-gray-900 {note.backgroundColor}">
+<Card class="aspect-square fade-in text-gray-900 {note.backgroundColor}">
 	<CardHeader>
 		<CardAction>
 			<div class="flex flex-row gap-2 items-center">
@@ -108,36 +101,36 @@
 				<Pen
 					class="cursor-pointer p-0.5 {isEditing === true ? `text-sky-400` : ``} hover:text-sky-400 transition-colors"
 					size={25} onclick={handleToggleEdit} />
-				<AlertDialog>
-					<AlertDialogTrigger>
-						<Eraser class="cursor-pointer p-0.5 hover:text-red-500 transition-colors" size={25} />
-					</AlertDialogTrigger>
-					<AlertDialogContent
-						onkeydown={(e) => {
-					if (e.key === 'Enter') {
-						handleDelete();
-					}
-				}}
-					>
-						<AlertDialogHeader>Are you sure?</AlertDialogHeader>
-						<AlertDialogDescription>This action cannot be undone</AlertDialogDescription>
-						<AlertDialogFooter>
-							<AlertDialogCancel>Cancel</AlertDialogCancel>
-							<AlertDialogAction
-								class="bg-red-600 hover:bg-red-700 text-white transition-colors"
-								onclick={handleDelete}
-								disabled={isDeleting}
-							>
-								{#if isDeleting}
-									<Spinner size="icon" />
-									Processing
-								{:else}
-									Confirm
-								{/if}
-							</AlertDialogAction>
-						</AlertDialogFooter>
-					</AlertDialogContent>
-				</AlertDialog>
+				<button onclick={() => {isDeletingAlertOpen = !isDeletingAlertOpen}}>
+					<Eraser class="cursor-pointer p-0.5 hover:text-red-500 transition-colors" size={25} />
+				</button>
+				{#if isDeletingAlertOpen}
+					<AlertDialog open={isDeletingAlertOpen}>
+						<AlertDialogContent
+							onkeydown={(e) => {
+								if (e.key === 'Enter') {
+									handleDelete();
+								}}}>
+							<AlertDialogHeader>Are you sure?</AlertDialogHeader>
+							<AlertDialogDescription>This action cannot be undone</AlertDialogDescription>
+							<AlertDialogFooter>
+								<AlertDialogCancel>Cancel</AlertDialogCancel>
+								<AlertDialogAction
+									class="bg-red-600 hover:bg-red-700 text-white transition-colors"
+									onclick={handleDelete}
+									disabled={isDeleting}
+								>
+									{#if isDeleting}
+										<Spinner size="icon" />
+										Processing
+									{:else}
+										Confirm
+									{/if}
+								</AlertDialogAction>
+							</AlertDialogFooter>
+						</AlertDialogContent>
+					</AlertDialog>
+				{/if}
 			</div>
 		</CardAction>
 	</CardHeader>
@@ -146,7 +139,7 @@
 			<form onsubmit={handleEditNote} class="w-full" noValidate>
 				<InputGroup>
 					<textarea
-						class="field-sizing-content bg-white/60 flex min-h-30 w-full md:resize-y resize-none rounded-md bg-transparent px-3 py-2.5 text-base outline-none transition-[color,box-shadow] md:text-sm"
+						class="field-sizing-content bg-white/60 flex min-h-30 w-full md:resize-y resize-none rounded-md px-3 py-2.5 text-base outline-none transition-[color,box-shadow] md:text-sm"
 						data-slot="input-group-control"
 						bind:value={editingNoteText}
 						onkeydown={handleKeyDown}
@@ -163,19 +156,19 @@
 	</CardContent>
 	<CardFooter class="flex flex-col gap-1 mt-auto">
 		<Popover>
-				<PopoverTrigger class="ms-auto size-4" asChild>
-					{#if note.isCompleted}
-						<CircleCheck />
-					{:else}
-						<InfoIcon />
-					{/if}
-				</PopoverTrigger>
-				<PopoverContent>
-					Created on: {formatDate(note.createdAt)} <br />
-					{#if note.isCompleted}
-						Completed on: {formatDate(note.completedAt)}
-					{/if}
-				</PopoverContent>
+			<PopoverTrigger class="ms-auto">
+				{#if note.isCompleted}
+					<CircleCheck />
+				{:else}
+					<InfoIcon />
+				{/if}
+			</PopoverTrigger>
+			<PopoverContent>
+				Created on: {formatDate(note.createdAt)} <br />
+				{#if note.isCompleted}
+					Completed on: {formatDate(note.completedAt)}
+				{/if}
+			</PopoverContent>
 		</Popover>
 	</CardFooter>
 </Card>

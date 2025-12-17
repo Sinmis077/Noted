@@ -8,8 +8,8 @@
 <div class="container mx-auto flex flex-col justify-center items-center">
 	<Empty>
 		<EmptyHeader>
-			<EmptyMedia variant="icon">
-				<Spinner class="size-12 text-blue-500" />
+			<EmptyMedia class="rounded-full" variant="icon">
+				<Spinner class="text-blue-500" />
 			</EmptyMedia>
 			<EmptyDescription>{description}</EmptyDescription>
 		</EmptyHeader>
