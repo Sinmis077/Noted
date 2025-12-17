@@ -1,15 +1,24 @@
 import { error, json } from '@sveltejs/kit';
-import { deleteNotes, getNotesByPassphrase, saveNote } from '$lib/server/notes_repository.js';
+import { deleteNotes, getNotesByPassphrase, saveNote, getFinishedNotesByPassphrase } from '$lib/server/notes_repository.js';
 
-export async function GET({ cookies }) {
+export async function GET({ cookies, url }) {
 	const passphrase = cookies.get('passphrase');
+	const noteStatus = url.searchParams.get('status');
 
 	if (!passphrase) {
 		return json([]);
 	}
 
 	try {
-		const notes = getNotesByPassphrase(passphrase);
+		let notes;
+		console.log(noteStatus)
+
+		if (noteStatus === 'unfinished') {
+			notes = getNotesByPassphrase(passphrase);
+		} else if (noteStatus === 'finished') {
+			notes = getFinishedNotesByPassphrase(passphrase);
+		}
+
 		return json(notes);
 	} catch (err) {
 		throw error(500, 'Failed to get notes from the database');
