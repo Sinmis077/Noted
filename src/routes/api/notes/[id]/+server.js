@@ -1,8 +1,8 @@
 import { error, json } from '@sveltejs/kit';
 import { deleteNote, saveNote } from '$lib/server/notes_repository.js';
 
-export async function PUT({ params, request, cookies }) {
-	const passphrase = cookies.get('passphrase');
+export async function PUT({ params, request, locals }) {
+	const passphrase = locals.workspace.passphrase;
 
 	if (!passphrase) {
 		throw error(401, 'No passphrase provided');
@@ -25,8 +25,8 @@ export async function PUT({ params, request, cookies }) {
 	}
 }
 
-export async function DELETE({ params, cookies }) {
-	const passphrase = cookies.get('passphrase');
+export async function DELETE({ params, locals }) {
+	const passphrase = locals.workspace.passphrase;
 
 	if (!passphrase) {
 		throw error(401, 'No passphrase provided');
