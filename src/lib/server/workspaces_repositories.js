@@ -2,13 +2,12 @@ import db from '$lib/server/database.js';
 
 export function getWorkspace(workspace) {
 	const stmt = db.prepare(`
-		SELECT passphrase, description
+		SELECT *
 		FROM workspaces
-		WHERE passphrase = ?
-			AND password = ?;
+		WHERE passphrase = ?;
 	`);
 
-	return stmt.run(workspace.passphrase, workspace.password);
+	return stmt.get(workspace.passphrase);
 }
 
 export function saveWorkspace(workspace) {
@@ -21,18 +20,18 @@ export function saveWorkspace(workspace) {
 																					 password    = excluded.password
 		RETURNING
 			passphrase,
-			description;
+			description,
+			password;
 	`);
 
-	return stmt.run(workspace.passphrase, workspace.description, workspace.password);
+	return stmt.get(workspace.passphrase, workspace.description, workspace.password);
 }
 
 export function deleteWorkspace(workspace) {
 	const stmt = db.prepare(`
 		DELETE FROM workspaces
-		WHERE passphrase = ?
-		AND password = ?;
+		WHERE passphrase = ?;
 	`);
 
-	return stmt.run(workspace.passphrase, workspace.password).changes > 0;
+	return stmt.run(workspace.passphrase).changes > 0;
 }

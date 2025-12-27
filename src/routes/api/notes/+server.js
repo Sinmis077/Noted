@@ -1,8 +1,8 @@
 import { error, json } from '@sveltejs/kit';
 import { deleteNotes, getNotesByPassphrase, saveNote } from '$lib/server/notes_repository.js';
 
-export async function GET({ cookies }) {
-	const passphrase = cookies.get('passphrase');
+export async function GET({ locals }) {
+	const passphrase = locals.workspace.passphrase;
 
 	if (!passphrase) {
 		return json([]);
@@ -17,8 +17,8 @@ export async function GET({ cookies }) {
 	}
 }
 
-export async function POST({ request, cookies }) {
-	const passphrase = cookies.get('passphrase');
+export async function POST({ request, locals }) {
+	const passphrase = locals.workspace.passphrase;
 
 	if (!passphrase) {
 		throw error(401, 'No passphrase provided. Please set a passphrase first');
@@ -41,8 +41,8 @@ export async function POST({ request, cookies }) {
 	}
 }
 
-export async function DELETE({ cookies }) {
-	const passphrase = cookies.get('passphrase');
+export async function DELETE({ locals }) {
+	const passphrase = locals.workspace.passphrase;
 
 	if (!passphrase) {
 		throw error(401, 'No passphrase provided');
