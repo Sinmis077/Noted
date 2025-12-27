@@ -9,7 +9,7 @@ const COLORS = [
 	'bg-electric-aqua',
 	'bg-baby-blue-ice',
 	'bg-periwinkle',
-	'bg-mauve',
+	'bg-mauve'
 ];
 
 function generateId() {
@@ -53,33 +53,21 @@ function createNotesStore() {
 				order: currentLength
 			};
 
-			try {
 				const { data } = await api.post('/notes', newNote);
 
 				update((notes) => [...notes, data]);
-			} catch (err) {
-				throw err;
-			}
 		},
 
 		editNote: async (note) => {
-			try {
-				const { data } = await api.put(`/notes/${note.id}`, note);
+			const { data } = await api.put(`/notes/${note.id}`, note);
 
-				update((notes) => notes.map((oldNote) => (oldNote.id === note.id ? data : oldNote)));
-			} catch (err) {
-				throw err;
-			}
+			update((notes) => notes.map((oldNote) => (oldNote.id === note.id ? data : oldNote)));
 		},
 
 		deleteNote: async (id) => {
-			try {
-				await api.delete(`/notes/${id}`);
+			await api.delete(`/notes/${id}`);
 
-				update((notes) => notes.filter((note) => note.id !== id));
-			} catch (err) {
-				throw err;
-			}
+			update((notes) => notes.filter((note) => note.id !== id));
 		},
 
 		toggleNoteComplete: async (id) => {
@@ -99,24 +87,16 @@ function createNotesStore() {
 				completedAt: !noteToUpdate.isCompleted ? new Date().toISOString() : null
 			};
 
-			try {
-				const { data } = await api.put(`/notes/${id}`, updatedNote);
+			const { data } = await api.put(`/notes/${id}`, updatedNote);
 
-				update((notes) => notes.map((note) => (note.id === id ? data : note)));
-			} catch (err) {
-				throw err;
-			}
+			update((notes) => notes.map((note) => (note.id === id ? data : note)));
 		},
 
 		clearAll: async () => {
-			try {
-				await api.delete(`/notes`);
-				update(() => {
-					return [];
-				});
-			} catch (err) {
-				throw err;
-			}
+			await api.delete(`/notes`);
+			update(() => {
+				return [];
+			});
 		}
 	};
 }

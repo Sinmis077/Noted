@@ -13,10 +13,15 @@
 	let { data, children } = $props();
 
 	let hasPassphrase = $derived(data.hasPassphrase);
+	let isHealthy = $derived(data.isHealthy);
 
 	let isLoading = $state(true);
 
 	onMount(async () => {
+		if(!isHealthy) {
+			await goto(resolve('/'))
+		}
+
 		if (hasPassphrase) {
 			await goto(resolve('/notes'));
 		} else await goto(resolve('/'));

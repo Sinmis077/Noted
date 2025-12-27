@@ -1,7 +1,6 @@
-import { getDB } from '$lib/server/database.js';
+import db from '$lib/server/database.js';
 
 export function getNotesByPassphrase(passphrase) {
-	const db = getDB();
 	const stmt = db.prepare(`
 	SELECT
 		id,
@@ -25,7 +24,6 @@ export function getNotesByPassphrase(passphrase) {
 }
 
 export function saveNote(passphrase, note) {
-	const db = getDB();
 	const stmt = db.prepare(`
 		INSERT INTO notes (id,
 											 passphrase, text, backgroundColor, isCompleted,
@@ -65,7 +63,6 @@ export function saveNote(passphrase, note) {
 }
 
 export function deleteNote(passphrase, noteId) {
-	const db = getDB();
 	const stmt = db.prepare(`
 		DELETE
 		FROM notes
@@ -78,7 +75,6 @@ export function deleteNote(passphrase, noteId) {
 }
 
 export function deleteNotes(passphrase) {
-	const db = getDB();
 	const stmt = db.prepare(`
 	DELETE FROM notes
 	WHERE passphrase = ?
@@ -89,7 +85,6 @@ export function deleteNotes(passphrase) {
 }
 
 export function passphraseExists(passphrase) {
-	const db = getDB();
 	const stmt = db.prepare(`
 		SELECT COUNT(*) as count
 		FROM notes

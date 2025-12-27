@@ -4,6 +4,8 @@ export default function migrate(db) {
 	backgroundColorMigration(db);
 	backgroundColorMigrationTwo(db);
 
+	addWorkspaceReferences(db, "addWorkspaceReferences_migration_26-12-2025");
+
 	console.log('Migration completed');
 }
 
@@ -68,6 +70,8 @@ function backgroundColorMigrationTwo(db) {
 	};
 
 	convertBackgroundColors(db, migrationLabel, CONVERSION_DATA);
+
+	console.log(`Completed ${migrationLabel}`);
 }
 
 function convertBackgroundColors(db, migrationLabel, conversionData) {
@@ -86,4 +90,56 @@ function convertBackgroundColors(db, migrationLabel, conversionData) {
 	} else {
 		console.log('No notes found to be migrated');
 	}
+}
+
+function addWorkspaceReferences(db, migrationLabel) {
+	if (db.prepare(`SELECT * FROM migrations WHERE label = ?`).get(migrationLabel)) return;
+
+	if(db.pragma('user_version', { simple: true }) !== '1') return;
+
+	const migrate = db.transaction(() => {
+		db.exec(`
+      INSERT OR IGNORE INTO workspaces(passphrase)
+      SELECT DISTINCT passphrase FROM notes;
+    `);
+
+		db.exec(`
+			CREATE TABLE notes_new
+			(
+				id              TEXT PRIMARY KEY,
+				passphrase      TEXT    NOT NULL REFERENCES workspaces (passphrase),
+				text            TEXT    NOT NULL,
+				backgroundColor TEXT    NOT NULL,
+				isCompleted     INTEGER NOT NULL DEFAULT 0,
+				createdAt       TEXT    NOT NULL,
+				completedAt     TEXT,
+				note_order      INTEGER NOT NULL,
+				category_label  TEXT             DEFAULT NULL REFERENCES categories (label),
+				UNIQUE (passphrase, id)
+			);
+
+			INSERT INTO notes_new (id, passphrase, text, backgroundColor, isCompleted, createdAt, completedAt, note_order)
+			SELECT id,
+						 passphrase,
+						 text,
+						 backgroundColor,
+						 isCompleted,
+						 createdAt,
+						 completedAt,
+						 note_order
+			FROM notes;
+
+			DROP TABLE notes;
+			ALTER TABLE notes_new
+				RENAME TO notes;
+
+			CREATE INDEX IF NOT EXISTS idx_passphrase ON notes (passphrase);
+		`);
+
+		db.prepare('INSERT INTO migrations(label) VALUES (?)').run(migrationLabel);
+	});
+
+	migrate();
+
+	console.log(`Completed ${migrationLabel}`);
 }
