@@ -1,29 +1,44 @@
-import '$lib/server/database.js';
-import { getFromPassphrase } from '$lib/services/workspace.service.js';
-import { error } from '@sveltejs/kit';
-import { extractPayload, isAuthenticated } from '$lib/services/jws.service.js';
+import '$lib/server/database/database.js';
+import { getFromPassphrase } from '$lib/server/services/workspace.service.js';
+import { redirect } from '@sveltejs/kit';
+import { extractPayload } from '$lib/server/services/jws.service.js';
 
-console.log('Initialized server...')
+console.log('Initialized server...');
+
+const publicRoutes = ['/', '/api/auth'];
+
+function isPublicRoute(dest) {
+	if (dest === '/') {
+		return true;
+	}
+
+	return publicRoutes.some((route) => route !== '/' && dest.startsWith(route));
+}
 
 export async function handle({ event, resolve }) {
-	if(await event.url.pathname === "/api/auth") return await resolve(event);
-
-	const request = await event.request;
-
-	const authHeader = await request.headers.get('authorization');
-
-	const token = authHeader?.substring(7);
-
-	if (!isAuthenticated(token)) {
-		return error(401, 'Unauthorized');
-	} else {
-		const { passphrase } = extractPayload(token);
-
-		const workspace = await getFromPassphrase(passphrase);
-		workspace.password = '';
-
-		event.locals.workspace = workspace;
-
-		return await resolve(event);
+	if (isPublicRoute(event.url.pathname)) {
+		return resolve(event);
 	}
+
+	const token = event.cookies.get('authentication');
+
+	const payload = extractPayload(token);
+	if (!payload) {
+		throw redirect(303, '/');
+	}
+
+	const { passphrase } = payload.data;
+
+	if (!passphrase) {
+		event.cookies.delete('authentication', { path: '/' });
+	}
+
+	const workspace = await getFromPassphrase(passphrase);
+
+	event.locals.workspace = {
+		...workspace,
+		password: undefined
+	};
+
+	return resolve(event);
 }

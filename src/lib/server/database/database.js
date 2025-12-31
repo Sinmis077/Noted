@@ -2,9 +2,11 @@ import Database from 'better-sqlite3';
 import { dev } from '$app/environment';
 import { mkdirSync } from 'fs';
 import { dirname } from 'path';
-import migrate from '$lib/server/database_migration.js';
+import migrate from '$lib/server/database/database_migration.js';
 
 const dbPath = dev ? 'notes-dev.db' : '/app/data/notes.db';
+
+const dbVersion = 4;
 
 // Create directory if needed
 const dir = dirname(dbPath);
@@ -12,7 +14,7 @@ if (dir !== '.') {
 	mkdirSync(dir, { recursive: true });
 }
 
-console.log("Initializing database...");
+console.log('Initializing database...');
 
 const db = new Database(dbPath, {
 	verbose: dev ? console.log : undefined
@@ -21,8 +23,8 @@ const db = new Database(dbPath, {
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
-if(db.pragma('user_version', { simple: true }) === null) {
-	db.pragma('user_version = 2');
+if (db.pragma('user_version', { simple: true }) === 0) {
+	db.pragma(`user_version = ${dbVersion}`);
 }
 
 db.exec(`
@@ -63,6 +65,11 @@ db.exec(`
 	CREATE INDEX IF NOT EXISTS idx_passphrase ON notes (passphrase);
 `);
 
-migrate(db);
+// Don't do the migration sequence if the database user_version is the same as a fresh one
+if (db.pragma('user_version', { simple: true }) < dbVersion) {
+	migrate(db);
+}
+
+console.log('Completed database initialization...');
 
 export default db;

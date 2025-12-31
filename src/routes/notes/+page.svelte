@@ -6,7 +6,7 @@
 <div class="p-5">
 	<NoteTopBar />
 
-	<hr class="border-1 border-gray-500 mb-5" />
+	<hr class="border border-gray-500 mb-5" />
 
 	<NotesMasonry />
 </div>

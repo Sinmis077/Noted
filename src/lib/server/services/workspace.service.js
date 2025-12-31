@@ -3,24 +3,25 @@ import {
 	deleteWorkspace,
 	getWorkspace,
 	saveWorkspace
-} from '$lib/server/workspaces_repositories.js';
+} from '$lib/server/database/workspaces_repository.js';
 import { error } from '@sveltejs/kit';
 
 export async function get(workspace) {
 	let dbWorkspace = getWorkspace(workspace);
 
-	if(dbWorkspace && dbWorkspace.password) {
-		if(await bcrypt.compare(workspace.password, dbWorkspace.password)) {
+	if (dbWorkspace && dbWorkspace.password) {
+		if (await bcrypt.compare(workspace.password, dbWorkspace.password)) {
 			return dbWorkspace;
 		} else throw error(400, 'Some or all your credentials are incorrect.');
-	} else {
-		return workspace;
+	} else if (dbWorkspace) {
+		return dbWorkspace;
 	}
+
+	return workspace;
 }
 
 export async function getFromPassphrase(passphrase) {
-	let workspace = passphrase ? getWorkspace({ passphrase }) : undefined;
-	return workspace ?? { passphrase };
+	return passphrase ? ((await get({ passphrase })) ?? { passphrase }) : null;
 }
 
 export function save(workspace) {
@@ -32,8 +33,8 @@ export function save(workspace) {
 export function remove(workspace) {
 	let dbWorkspace = getWorkspace(workspace);
 
-	if(dbWorkspace && dbWorkspace.password) {
-		if(bcrypt.compare(workspace.password, dbWorkspace.password)) {
+	if (dbWorkspace && dbWorkspace.password) {
+		if (bcrypt.compare(workspace.password, dbWorkspace.password)) {
 			deleteWorkspace(workspace);
 		}
 	}

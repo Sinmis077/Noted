@@ -53,9 +53,9 @@ function createNotesStore() {
 				order: currentLength
 			};
 
-				const { data } = await api.post('/notes', newNote);
+			const { data } = await api.post('/notes', newNote);
 
-				update((notes) => [...notes, data]);
+			update((notes) => [...notes, data]);
 		},
 
 		editNote: async (note) => {

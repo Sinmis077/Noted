@@ -10,12 +10,7 @@
 		AlertDialogTrigger
 	} from '$lib/components/ui/alert-dialog/index.js';
 	import { notes } from '$lib/stores/note.js';
-	import {
-		InputGroup,
-		InputGroupAddon,
-		InputGroupButton
-	} from '$lib/components/ui/input-group/index.js';
-	import { page } from '$app/state';
+	import { InputGroup, InputGroupAddon, InputGroupButton } from '$lib/components/ui/input-group/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { api } from '$lib/utils/api.js';
 	import { goto, invalidateAll } from '$app/navigation';
@@ -24,10 +19,12 @@
 	import { LogOut, Paintbrush } from 'lucide-svelte';
 	import { Spinner } from '$lib/components/ui/spinner/index.js';
 	import NoteDrawer from '$lib/components/note-drawer.svelte';
+	import { page } from '$app/state';
 
 	let newNoteText = $state('');
 
-	const passphrase = page.data.passphrase;
+	const { workspace } = page.data;
+	const passphrase = $derived(workspace.passphrase);
 
 	let isDialogOpen = $state(false);
 	let isDeleting = $state(false);
@@ -70,7 +67,7 @@
 
 	async function handleLeaveWorkspace() {
 		try {
-			await api.delete('/passphrase');
+			await api.delete('/auth');
 
 			await invalidateAll();
 
@@ -104,7 +101,7 @@
 		<div class="flex gap-2">
 			<AlertDialog bind:open={isDialogOpen}>
 				<AlertDialogTrigger
-					class="cursor-pointer bg-red-700 hover:bg-red-800 transition-colors p-1 px-10 rounded-[8px] text-white"
+					class="cursor-pointer bg-red-700 hover:bg-red-800 transition-colors p-1 px-10 rounded-xl text-white"
 				>
 					<div class="flex flex-row items-center gap-2">
 						<Paintbrush size={16} />

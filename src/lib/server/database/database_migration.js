@@ -13,10 +13,6 @@ export default function migrate(db) {
 function backgroundColorMigration(db) {
 	let migrationLabel = 'backgroundColor_migration_8-12-2025';
 
-	console.log(`Attempting to conduct ${migrationLabel} migration`);
-
-	if (db.prepare(`SELECT * FROM migrations WHERE label = ?`).get(migrationLabel)) return;
-
 	const CONVERSION_DATA = {
 		'bg-red-100': 'bg-red-200 dark:bg-red-600',
 		'bg-amber-100': 'bg-amber-200 dark:bg-amber-600',
@@ -46,10 +42,6 @@ function backgroundColorMigration(db) {
 function backgroundColorMigrationTwo(db) {
 	let migrationLabel = 'backgroundColor_migration_9-12-2025';
 
-	console.log(`Attempting to conduct ${migrationLabel} migration`);
-
-	if (db.prepare(`SELECT * FROM migrations WHERE label = ?`).get(migrationLabel)) return;
-
 	const CONVERSION_DATA = {
 		'bg-red-200 dark:bg-red-600': 'bg-powder-blush',
 		'bg-amber-200 dark:bg-amber-600': 'bg-apricot-cream',
@@ -71,10 +63,13 @@ function backgroundColorMigrationTwo(db) {
 
 	convertBackgroundColors(db, migrationLabel, CONVERSION_DATA);
 
-	console.log(`Completed ${migrationLabel}`);
 }
 
 function convertBackgroundColors(db, migrationLabel, conversionData) {
+	if (db.prepare(`SELECT * FROM migrations WHERE label = ?`).get(migrationLabel)) return;
+
+	console.log(`Attempting to conduct ${migrationLabel} migration`);
+
 	const stmt = db.prepare('UPDATE notes SET backgroundColor = ? WHERE backgroundColor = ?');
 
 	let updateCount = 0;
@@ -84,9 +79,10 @@ function convertBackgroundColors(db, migrationLabel, conversionData) {
 	}
 
 	if (updateCount > 0) {
-		db.prepare('INSERT INTO migrations(label) VALUES (?)').run(migrationLabel);
+		db.exec(`INSERT INTO migrations(label) VALUES (${migrationLabel})`);
 
 		console.log(`Updated ${updateCount} note(s) with new color format`);
+		console.log(`Completed ${migrationLabel}`);
 	} else {
 		console.log('No notes found to be migrated');
 	}
@@ -95,7 +91,7 @@ function convertBackgroundColors(db, migrationLabel, conversionData) {
 function addWorkspaceReferences(db, migrationLabel) {
 	if (db.prepare(`SELECT * FROM migrations WHERE label = ?`).get(migrationLabel)) return;
 
-	if(db.pragma('user_version', { simple: true }) !== '1') return;
+	if(db.pragma('user_version', { simple: true }) > 3) return;
 
 	const migrate = db.transaction(() => {
 		db.exec(`
@@ -136,6 +132,7 @@ function addWorkspaceReferences(db, migrationLabel) {
 			CREATE INDEX IF NOT EXISTS idx_passphrase ON notes (passphrase);
 		`);
 
+		db.pragma('user_version = 4');
 		db.prepare('INSERT INTO migrations(label) VALUES (?)').run(migrationLabel);
 	});
 
