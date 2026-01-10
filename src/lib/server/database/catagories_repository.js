@@ -16,12 +16,11 @@ const saveStmt = db.prepare(`
 																				 RETURNING *;
 	`);
 
-const deleteStmt = db.prepare(`
-		DELETE
-		FROM categories
-		WHERE label = ?
-			AND passphrase = ?;
-	`);
+const deleteTscn = db.transaction((workspace, label) => {
+	db.prepare(`UPDATE notes SET category_label = null WHERE category_label = ?`).run(label);
+
+	return db.prepare(`DELETE FROM categories WHERE label = ? AND passphrase = ?`).run(label, workspace.passphrase).changes > 0;
+})
 
 export function getCategoriesByPassphrase(passphrase) {
 	return getStmt.all(passphrase);
@@ -32,5 +31,5 @@ export function saveCategory(workspace, category) {
 }
 
 export function deleteCategory(workspace, label) {
-	return deleteStmt.run(label, workspace.passphrase).changes > 0;
+	return deleteTscn(workspace, label);
 }

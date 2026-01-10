@@ -10,8 +10,8 @@
 		AlertDialogFooter,
 		AlertDialogHeader
 	} from '$lib/components/ui/alert-dialog/index.js';
-	import { CircleCheck, Eraser, InfoIcon, Pen, Square, SquareCheck, TextAlignJustify } from 'lucide-svelte';
-	import { InputGroup, InputGroupAddon, InputGroupButton } from '$lib/components/ui/input-group/index.js';
+	import { CircleCheck, Eraser, InfoIcon, Pen, Square, SquareCheck } from 'lucide-svelte';
+	import { InputGroup, InputGroupAddon, InputGroupButton, Textarea } from '$lib/components/ui/input-group/index.js';
 	import { toast } from 'svelte-sonner';
 	import { Spinner } from '$lib/components/ui/spinner/index.js';
 	import { Popover, PopoverContent, PopoverTrigger } from '$lib/components/ui/popover/index.js';
@@ -103,15 +103,14 @@
 					<Square class="cursor-pointer hover:text-[#03C03C] transition-colors" onclick={handleMarkComplete} />
 				{/if}
 
-				<TextAlignJustify class="cursor-not-allowed hover:text-rose-500 transition-colors" size={25} />
 				<Pen
-					class="cursor-pointer p-0.5 {isEditing === true ? `text-sky-400` : ``} hover:text-sky-400 transition-colors"
+					class="cursor-pointer p-0.5 {isEditing === true ? `text-blue-600` : ``} hover:text-sky-600 transition-colors"
 					size={25} onclick={handleToggleEdit} />
 				<button onclick={() => {isDeletingAlertOpen = !isDeletingAlertOpen}}>
 					<Eraser class="cursor-pointer p-0.5 hover:text-red-500 transition-colors" size={25} />
 				</button>
 				{#if isDeletingAlertOpen}
-					<AlertDialog open={isDeletingAlertOpen}>
+					<AlertDialog bind:open={isDeletingAlertOpen}>
 						<AlertDialogContent
 							onkeydown={(e) => {
 								if (e.key === 'Enter') {
@@ -143,14 +142,15 @@
 	<CardContent>
 		{#if isEditing}
 			<form onsubmit={handleEditNote} class="w-full" noValidate>
-				<InputGroup>
-					<textarea
-						class="field-sizing-content bg-white/60 flex min-h-30 w-full md:resize-y resize-none rounded-md px-3 py-2.5 text-base outline-none transition-[color,box-shadow] md:text-sm"
+				<InputGroup class="bg-white/70 dark:bg-white/70">
+					<Textarea
+						class="field-sizing-content bg-white flex min-h-20 w-full resize-none rounded-md px-3 py-2.5 text-base outline-none transition-[color,box-shadow] md:text-sm"
 						data-slot="input-group-control"
+						autosize={true}
 						bind:value={editingNoteText}
 						onkeydown={handleKeyDown}
 						placeholder="What would you like to do?"
-					></textarea>
+					></Textarea>
 					<InputGroupAddon align="block-end">
 						<InputGroupButton class="ms-auto" type="submit" variant="default">Submit</InputGroupButton>
 					</InputGroupAddon>

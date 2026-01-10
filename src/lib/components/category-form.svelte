@@ -1,8 +1,5 @@
 <script>
-
-
 	import { toast } from 'svelte-sonner';
-	import { api } from '$lib/utils/api.js';
 	import {
 		InputGroup,
 		InputGroupAddon,
@@ -11,24 +8,34 @@
 	} from '$lib/components/ui/input-group/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
+	import { categories } from '$lib/stores/categories.js';
 
 	let label = $state(null);
-	let description = $state(null);
+	let description = $state(category?.description);
 
-	let { open = $bindable(true) } = $props();
+	let { open = $bindable(true), category } = $props();
 
 	async function handleSubmit() {
 		try {
-			await api.post('/categories', {
-				label: label,
-				description: description
-			});
+			if (category) {
+				await categories.editCategory({
+					...category,
+					description: description
+				});
 
-			open = false;
+				toast.success(`${category.label} updated!`);
+			} else {
+				await categories.addCategory({
+					label: label,
+					description: description
+				});
 
-			toast.success('Category added!');
+				toast.success('Category added!');
+			}
 		} catch (err) {
 			toast.error(err.message);
+		} finally {
+			open = false;
 		}
 	}
 
@@ -47,16 +54,18 @@
 </script>
 
 <form class="flex flex-col gap-3">
-	<InputGroup>
-		<InputGroupAddon>
-			<Label>Label:</Label>
-		</InputGroupAddon>
-		<InputGroupInput
-			onkeydown={handleEnter}
-			bind:value={label}
-			placeholder="Homework"
-		/>
-	</InputGroup>
+	{#if !category}
+		<InputGroup>
+			<InputGroupAddon>
+				<Label>Label:</Label>
+			</InputGroupAddon>
+			<InputGroupInput
+				onkeydown={handleEnter}
+				bind:value={label}
+				placeholder="Homework"
+			/>
+		</InputGroup>
+	{/if}
 	<InputGroup>
 		<InputGroupAddon align="block-start">
 			<Label>Description:</Label>

@@ -20,80 +20,6 @@ function randomBackgroundColor() {
 	return COLORS[Math.floor(((Math.random() + Math.random() + Math.random()) % 1) * COLORS.length)];
 }
 
-// export const notes = {
-// 	list: [],
-// 	category: 'to-dos',
-//
-// 	subscribe: (
-// 		run = async (category) => {
-// 			this.category = category;
-// 			try {
-// 				const { data } = await api.get('/notes', { params: { category: this.category } });
-// 				this.set(data);
-// 			} catch (err) {
-// 				this.set([]);
-// 				throw err;
-// 			}
-// 		}
-// 	) => {
-// 		this.category = null;
-// 		this.list = null;
-// 		return null;
-// 	},
-//
-// 	set: (notes) => {
-// 		this.list = notes;
-// 	},
-//
-// 	add: async (text) => {
-// 		const newNote = {
-// 			id: generateId(),
-// 			text,
-// 			backgroundColor: randomBackgroundColor(),
-// 			isCompleted: false,
-// 			createdAt: new Date().toISOString(),
-// 			completedAt: null,
-// 			category: this.category !== 'to-dos' ? this.category : null,
-// 			order: this.list.length
-// 		};
-//
-// 		const { data } = await api.post('/notes', newNote);
-//
-// 		this.list = [...this.list, data];
-// 	},
-//
-// 	toggleComplete: async (note) => {
-// 		await this.update({
-// 			...note,
-// 			isCompleted: !note.isCompleted,
-// 			completedAt: !note.isCompleted ? new Date().toISOString() : null
-// 		});
-// 	},
-//
-// 	update: async (note) => {
-// 		const { data } = await api.put('/notes', note);
-//
-// 		this.list = this.list.map((note) => {
-// 			if (note.id === data.id) {
-// 				return data;
-// 			}
-// 			return note;
-// 		});
-// 	},
-//
-// 	remove: async (noteId) => {
-// 		await api.delete(`/notes/${noteId}`);
-//
-// 		this.list = this.list.filter((note) => note.id !== noteId);
-// 	},
-//
-// 	clear: async () => {
-// 		await api.delete(`/notes`);
-//
-// 		this.list = [];
-// 	}
-// };
-
 function createNotesStore() {
 	const { subscribe, set, update } = writable([]);
 
@@ -102,7 +28,7 @@ function createNotesStore() {
 
 		loadNotes: async (category) => {
 			try {
-				const { data } = await api.get('/notes', { params : { category } });
+				const { data } = await api.get('/notes', { params: { category } });
 				set(data);
 			} catch (err) {
 				set([]);
@@ -124,7 +50,7 @@ function createNotesStore() {
 				isCompleted: false,
 				createdAt: new Date().toISOString(),
 				completedAt: null,
-				category,
+				category: category !== 'to-dos' ? category : null,
 				order: currentLength
 			};
 
@@ -137,12 +63,6 @@ function createNotesStore() {
 			const { data } = await api.put(`/notes/${note.id}`, note);
 
 			update((notes) => notes.map((oldNote) => (oldNote.id === note.id ? data : oldNote)));
-		},
-
-		deleteNote: async (id) => {
-			await api.delete(`/notes/${id}`);
-
-			update((notes) => notes.filter((note) => note.id !== id));
 		},
 
 		toggleNoteComplete: async (id) => {
@@ -167,8 +87,15 @@ function createNotesStore() {
 			update((notes) => notes.map((note) => (note.id === id ? data : note)));
 		},
 
+		deleteNote: async (id) => {
+			await api.delete(`/notes/${id}`);
+
+			update((notes) => notes.filter((note) => note.id !== id));
+		},
+
 		clearAll: async () => {
 			await api.delete(`/notes`);
+
 			update(() => {
 				return [];
 			});

@@ -2,9 +2,7 @@
 	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card/index.js';
 	import {
 		InputGroup,
-		InputGroupAddon,
 		InputGroupInput,
-		InputGroupText
 	} from '$lib/components/ui/input-group/index.js';
 	import { enhance } from '$app/forms';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -37,16 +35,16 @@
 						type="text"
 						placeholder="Enter your passphrase"
 					/>
-				</InputGroup>
-				<InputGroup class="mt-4">
-					<InputGroupInput
-						name="password"
-						type="text"
-						placeholder="Enter your password"
-					/>
-					<InputGroupAddon align="inline-end">
-						<InputGroupText class="italic">Optional</InputGroupText>
-					</InputGroupAddon>
+<!--				</InputGroup>-->
+<!--				<InputGroup class="mt-4">-->
+<!--					<InputGroupInput-->
+<!--						name="password"-->
+<!--						type="password"-->
+<!--						placeholder="Enter your password"-->
+<!--					/>-->
+<!--					<InputGroupAddon align="inline-end">-->
+<!--						<InputGroupText class="italic">Optional</InputGroupText>-->
+<!--					</InputGroupAddon>-->
 				</InputGroup>
 				<Button type="submit" class="mt-5" size="lg" disabled={isLoading}>
 					{#if isLoading}
