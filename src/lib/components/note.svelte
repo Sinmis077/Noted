@@ -1,5 +1,5 @@
 <script>
-	import { notes } from '$lib/stores/note.js';
+	import { notes } from '$lib/stores/notes.js';
 	import { Card, CardAction, CardContent, CardFooter, CardHeader } from '$lib/components/ui/card/index.js';
 	import {
 		AlertDialog,

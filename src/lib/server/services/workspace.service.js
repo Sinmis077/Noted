@@ -25,7 +25,9 @@ export async function getFromPassphrase(passphrase) {
 }
 
 export function save(workspace) {
-	workspace.password = bcrypt.hashSync(workspace.password, 10);
+	if(workspace.password) {
+		workspace.password = bcrypt.hashSync(workspace.password, 10);
+	}
 
 	saveWorkspace(workspace);
 }

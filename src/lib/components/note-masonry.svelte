@@ -1,33 +1,27 @@
 <script>
 	import Note from '$lib/components/note.svelte';
 	import Loading from '$lib/components/loading.svelte';
-	import { notes } from '$lib/stores/note.js';
-	import { onMount } from 'svelte';
+	import { notes } from '$lib/stores/notes.js';
 	import Masonry from 'svelte-bricks';
 
 	let isLoading = $state(false);
 	let error = $state(null);
 
-	let { noteStatus = { completed: false } } = $props();
+	let { searchCategoryParam } = $props();
 
 	let [minColWidth, maxColWidth, gap] = [250, 400, 12];
 
-	onMount(async () => {
+	$effect(async () => {
 		isLoading = true;
 
-		if($notes.length) {
-			isLoading = false;
-			return;
-		}
-
 		try {
-			await notes.loadNotes();
+			await notes.loadNotes(searchCategoryParam);
 		} catch (err) {
 			error = err;
 		} finally {
 			isLoading = false;
 		}
-	});
+	})
 </script>
 
 {#if isLoading}
@@ -43,7 +37,7 @@
 			<Masonry
 				animate={true}
 				duration={100}
-				items={$notes.filter((note) => note.isCompleted === noteStatus.completed)}
+				items={$notes}
 				idKey='id'
 				{minColWidth}
 				{maxColWidth}

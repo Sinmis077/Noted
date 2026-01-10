@@ -11,9 +11,9 @@ const saveStmt = db.prepare(`
 														description,
 														passphrase)
 		VALUES (?, ?, ?)
-		ON CONFLICT (passphrase, label) DO UPDATE SET label       = excluded.label,
-																									description = excluded.description
-		RETURNING *;
+			ON CONFLICT (passphrase, label) DO UPDATE SET
+																					 description = excluded.description
+																				 RETURNING *;
 	`);
 
 const deleteStmt = db.prepare(`
@@ -28,7 +28,7 @@ export function getCategoriesByPassphrase(passphrase) {
 }
 
 export function saveCategory(workspace, category) {
-	return saveStmt.run(category.label, category.description, workspace.passphrase);
+	return saveStmt.get(category.label, category.description, workspace.passphrase);
 }
 
 export function deleteCategory(workspace, label) {

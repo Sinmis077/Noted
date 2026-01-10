@@ -126,6 +126,7 @@ function addWorkspaceReferences(db, migrationLabel) {
 			FROM notes;
 
 			DROP TABLE notes;
+
 			ALTER TABLE notes_new
 				RENAME TO notes;
 

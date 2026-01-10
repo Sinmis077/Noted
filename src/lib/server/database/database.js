@@ -30,16 +30,17 @@ if (db.pragma('user_version', { simple: true }) === 0) {
 db.exec(`
 	CREATE TABLE IF NOT EXISTS workspaces
 	(
-		passphrase TEXT PRIMARY KEY,
+		passphrase  TEXT PRIMARY KEY,
 		description TEXT,
-		password   TEXT
+		password    TEXT
 	);
 
 	CREATE TABLE IF NOT EXISTS categories
 	(
-		label      TEXT PRIMARY KEY,
+		label       TEXT PRIMARY KEY,
 		description TEXT,
-		passphrase TEXT REFERENCES workspaces (passphrase)
+		passphrase  TEXT NOT NULL REFERENCES workspaces (passphrase),
+		UNIQUE (label, passphrase)
 	);
 
 	CREATE TABLE IF NOT EXISTS notes
