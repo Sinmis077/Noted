@@ -9,20 +9,22 @@
 	import { toTitleCase } from '$lib/utils.js';
 
 	let { data } = $props();
+
 	let categories = $derived([
 		{ label: 'to-dos', description: 'Things left to-do' },
 		...data.categories,
 		{ label: 'completed', description: 'I\'ve completed these, I should be proud!' }
 	]);
 
-	let currentCategory = $state(categories[0].label);
+	let currentCategory = $derived(categories[0]);
+	let currentCategoryLabel = $derived(currentCategory.label);
 
 	let isDialogOpen = $state(false);
 
-	function changeTab(categoryLabel) {
-		if(currentCategory === categoryLabel) return;
+	function changeTab(category) {
+		if(currentCategory.label === category.label) return;
 
-		currentCategory = categoryLabel;
+		currentCategory = category;
 	}
 </script>
 
@@ -31,7 +33,7 @@
 
 	<hr class="border border-gray-500 mb-5" />
 
-	<Tabs value={currentCategory}>
+	<Tabs bind:value={currentCategoryLabel}>
 		<TabsList class="bg-primary/10">
 			{#each categories as category (category.label)}
 				{#if category.label === 'completed'}
@@ -46,11 +48,14 @@
 						<CategoryForm bind:open={isDialogOpen} />
 					</Dialog>
 				{/if}
-				<TabsTrigger value={category.label} onclick={() => changeTab(category.label)}>{toTitleCase(category.label)}</TabsTrigger>
+				<TabsTrigger value={category.label} onclick={() => changeTab(category)}>{toTitleCase(category.label)}</TabsTrigger>
 			{/each}
 		</TabsList>
-		<TabsContent value={currentCategory}>
-			<NotesMasonry searchCategoryParam={currentCategory} />
+		<TabsContent value={currentCategoryLabel}>
+			{#if currentCategory.description}
+				<p class="text-primary/77 italic">{currentCategory.description}</p>
+			{/if}
+			<NotesMasonry searchCategoryParam={currentCategory.label} />
 		</TabsContent>
 	</Tabs>
 </div>

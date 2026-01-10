@@ -54,7 +54,8 @@
 		<InputGroupInput
 			onkeydown={handleEnter}
 			bind:value={label}
-			placeholder="Homework" />
+			placeholder="Homework"
+		/>
 	</InputGroup>
 	<InputGroup>
 		<InputGroupAddon align="block-start">
@@ -63,7 +64,7 @@
 		<InputGroupTextarea
 			onkeydown={handleEnter}
 			bind:value={description}
-			placeholder="An informative description" />
+			placeholder="The homework I have left to do..." />
 		<InputGroupAddon class="ms-auto" align="end">
 			<InputGroupText class="italic me-3">Optional</InputGroupText>
 		</InputGroupAddon>

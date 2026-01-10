@@ -28,9 +28,15 @@
 	async function handleMarkComplete() {
 		isChecking = true;
 		try {
-			toast.loading('Marking the toast as complete');
+			if(!note.isCompleted) {
+				toast.loading('Marking the note as complete');
+			} else toast.loading('Unmarking the note as complete');
+
 			await notes.toggleNoteComplete(note.id);
-			toast.success('Marked note as completed');
+
+			if(note.isCompleted) {
+				toast.success('Marked the note as completed');
+			} else toast.success('Unmarked the note as complete');
 		} catch (err) {
 			toast.error(err.message);
 		} finally {

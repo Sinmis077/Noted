@@ -104,6 +104,8 @@ export function getNotesByPassphraseAndCategory(passphrase, category) {
 }
 
 export function saveNote(passphrase, note) {
+	note.category = note.category?.label;
+
 	let dbNote = saveTscn(passphrase, note);
 
 	return {
