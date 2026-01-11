@@ -63,6 +63,9 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - DATABASE_PATH=app/data/noted.db
+      - JWT_SECRET=THISISASECRETDONOTREVEALTOANYONEORYOURSECURITYISCOMPROMISED
+      - JWT_EXPIRY=3600000
 
     volumes:
       - noted-data:/app/data
@@ -87,6 +90,9 @@ Access at `http://localhost:3000`
 |---------------------|---------|-------------|
 | `NODE_ENV` | `production` | Application environment |
 | `PORT` | `3000` | Port the application runs on |
+| `DATABASE_PATH` | The path to where the database is located |
+| `JWT_SECRET` | The secret that the jwt.service uses to make tokens |
+| `JWT_EXPIRY` | How long does the token last for in milliseconds (default is 1 hour) |
 
 ### Data Persistence
 
