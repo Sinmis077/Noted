@@ -157,7 +157,7 @@
 				</InputGroup>
 			</form>
 		{:else}
-			<p class:line-through={note.isCompleted} class="wrap-break-word">{note.text}</p>
+			<p class:line-through={note.isCompleted} class="wrap-break-word whitespace-pre-wrap">{note.text}</p>
 		{/if}
 	</CardContent>
 	<CardFooter class="flex flex-col gap-1 mt-auto">

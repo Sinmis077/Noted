@@ -13,7 +13,7 @@
 	let label = $state(null);
 	let description = $state(category?.description);
 
-	let { open = $bindable(true), category } = $props();
+	let { open = $bindable(true), currentCategory = $bindable({}), category } = $props();
 
 	async function handleSubmit() {
 		try {
@@ -25,7 +25,7 @@
 
 				toast.success(`${category.label} updated!`);
 			} else {
-				await categories.addCategory({
+				 currentCategory = await categories.addCategory({
 					label: label,
 					description: description
 				});
@@ -50,7 +50,6 @@
 			handleSubmit();
 		}
 	}
-
 </script>
 
 <form class="flex flex-col gap-3">

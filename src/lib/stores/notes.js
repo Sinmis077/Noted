@@ -12,10 +12,6 @@ const COLORS = [
 	'bg-mauve'
 ];
 
-function generateId() {
-	return Date.now().toString(36);
-}
-
 function randomBackgroundColor() {
 	return COLORS[Math.floor(((Math.random() + Math.random() + Math.random()) % 1) * COLORS.length)];
 }
@@ -44,13 +40,12 @@ function createNotesStore() {
 			});
 
 			const newNote = {
-				id: generateId(),
 				text,
 				backgroundColor: randomBackgroundColor(),
 				isCompleted: false,
 				createdAt: new Date().toISOString(),
 				completedAt: null,
-				category: category !== 'to-dos' ? category : null,
+				category: category,
 				order: currentLength
 			};
 

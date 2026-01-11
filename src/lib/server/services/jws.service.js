@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET, JWT_EXPIRY } from '$env/static/private';
 
 // 256+ bit secret and expiry in milliseconds
-const jwtExpiry = parseInt(JWT_EXPIRY);
+const jwtSecret = process.env.JWT_SECRET;
+const jwtExpiry = parseInt(process.env.JWT_EXPIRY);
 
 export function generateJws(workspace) {
 	return jwt.sign(
@@ -13,7 +13,7 @@ export function generateJws(workspace) {
 			},
 			iss: 'Noted'
 		},
-		JWT_SECRET
+		jwtSecret
 	);
 }
 
@@ -21,7 +21,7 @@ export function extractPayload(token) {
 	if (!token) return null;
 
 	try {
-		return jwt.verify(token, JWT_SECRET, {
+		return jwt.verify(token, jwtSecret, {
 			issuer: 'Noted'
 		});
 	} catch (err) {

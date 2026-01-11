@@ -4,7 +4,7 @@ import { mkdirSync } from 'fs';
 import { dirname } from 'path';
 import migrate from '$lib/server/database/database_migration.js';
 
-const dbPath = dev ? 'notes-dev.db' : '/app/data/notes.db';
+const dbPath = dev ? 'notes-dev.db' : process.env.DATABASE_PATH ?? './data/notes.db';
 
 const dbVersion = 4;
 
@@ -37,10 +37,11 @@ db.exec(`
 
 	CREATE TABLE IF NOT EXISTS categories
 	(
-		label       TEXT PRIMARY KEY,
+		id          TEXT PRIMARY KEY,
+		label       TEXT NOT NULL,
 		description TEXT,
 		passphrase  TEXT NOT NULL REFERENCES workspaces (passphrase),
-		UNIQUE (label, passphrase)
+		CONSTRAINT categories_unique_per_workspace UNIQUE (label, passphrase)
 	);
 
 	CREATE TABLE IF NOT EXISTS notes
@@ -53,8 +54,8 @@ db.exec(`
 		createdAt       TEXT    NOT NULL,
 		completedAt     TEXT,
 		note_order      INTEGER NOT NULL,
-		category_label  TEXT             DEFAULT null REFERENCES categories (label),
-		UNIQUE (passphrase, id)
+		category_id     TEXT             DEFAULT null REFERENCES categories (id),
+		CONSTRAINT notes_unique_per_workspace UNIQUE (passphrase, id)
 	);
 
 	CREATE TABLE IF NOT EXISTS migrations
@@ -64,6 +65,7 @@ db.exec(`
 	);
 
 	CREATE INDEX IF NOT EXISTS idx_passphrase ON notes (passphrase);
+	CREATE INDEX IF NOT EXISTS idx_categories ON categories (passphrase);
 `);
 
 // Don't do the migration sequence if the database user_version is the same as a fresh one

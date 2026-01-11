@@ -34,7 +34,7 @@
 		}
 	});
 
-	let currentCategory = $derived(null);
+	let currentCategory = $state(null);
 	let currentCategoryLabel = $derived(currentCategory?.label);
 
 	let isDialogOpen = $state(false);
@@ -76,7 +76,7 @@
 	{:else if errors?.length > 0}
 		<p class="text-red-600">{errors}</p>
 	{:else}
-		<Tabs bind:value={currentCategoryLabel}>
+		<Tabs value={currentCategoryLabel}>
 			<TabsList class="bg-primary/10">
 				{#each $categories.filter((category) => category.label !== 'completed') as category (category.label)}
 					<TabsTrigger value={category.label}
@@ -102,7 +102,7 @@
 									noClose={true}
 									title="Add new category"
 									description="Add new category to keep your notes neatly sorted!">
-						<CategoryForm bind:open={isDialogOpen} />
+						<CategoryForm bind:open={isDialogOpen} bind:currentCategory={currentCategory} />
 					</Dialog>
 				{/if}
 				<TabsTrigger value='completed'

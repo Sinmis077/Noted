@@ -8,7 +8,7 @@ const getByPassphraseStmt = db.prepare(`
 			isCompleted,
 			createdAt,
 			completedAt,
-			category_label as "category",
+			category_id as "category",
 			note_order as "order"
 		FROM notes
 		WHERE passphrase = ?
@@ -16,17 +16,18 @@ const getByPassphraseStmt = db.prepare(`
 	`);
 
 const getByPassphraseAndCategoryStmt = db.prepare(`
-	SELECT id,
-				 text,
-				 backgroundColor,
-				 isCompleted,
-				 createdAt,
-				 completedAt,
-				 category_label as "category",
-				 note_order as "order"
-	FROM notes
-	WHERE passphrase = ?
-		AND category_label = ?
+	SELECT n.id,
+				 n.text,
+				 n.backgroundColor,
+				 n.isCompleted,
+				 n.createdAt,
+				 n.completedAt,
+				 n.category_id as "category",
+				 n.note_order as "order"
+	FROM notes as n
+	INNER JOIN categories as c ON n.category_id = c.id
+	WHERE n.passphrase = ?
+		AND c.label = ?
 	ORDER BY note_order DESC;
 `);
 
@@ -41,13 +42,13 @@ const saveTscn = db.transaction((passphrase, note) => {
 			`
 				INSERT INTO notes (id,
 													 passphrase, text, backgroundColor, isCompleted,
-													 createdAt, completedAt, category_label, note_order)
+													 createdAt, completedAt, category_id, note_order)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 				ON CONFLICT (passphrase, id) DO UPDATE SET text            = excluded.text,
 																									 backgroundColor = excluded.backgroundColor,
 																									 isCompleted     = excluded.isCompleted,
 																									 completedAt     = excluded.completedAt,
-																									 category_label  = excluded.category_label,
+																									 category_id     = excluded.category_id,
 																									 note_order      = excluded.note_order
 				RETURNING
 					id,
@@ -56,12 +57,12 @@ const saveTscn = db.transaction((passphrase, note) => {
 					isCompleted,
 					createdAt,
 					completedAt,
-					category_label as "category",
+					category_id as "category",
 					note_order as "order";
 			`
 		)
 		.get(
-			note.id,
+			note.id ?? Date.now().toString(36),
 			passphrase,
 			note.text,
 			note.backgroundColor,
@@ -105,6 +106,10 @@ export function getNotesByPassphraseAndCategory(passphrase, category) {
 
 export function saveNote(passphrase, note) {
 	note.category = note.category?.label ?? note.category;
+
+	if (note.category === 'to-dos' || note.category === 'completed') {
+		note.category = null;
+	}
 
 	let dbNote = saveTscn(passphrase, note);
 

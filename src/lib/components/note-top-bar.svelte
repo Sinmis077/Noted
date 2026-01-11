@@ -21,7 +21,7 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { toast } from 'svelte-sonner';
-	import { LogOut, Paintbrush, PenLine, X } from 'lucide-svelte';
+	import { LogOut, Paintbrush, PenLine } from 'lucide-svelte';
 	import { Spinner } from '$lib/components/ui/spinner/index.js';
 	import { page } from '$app/state';
 
@@ -46,7 +46,7 @@
 		try {
 			if (newNoteText.trim()) {
 				toast.loading('Saving note...');
-				await notes.addNote(newNoteText, currentCategory);
+				await notes.addNote(newNoteText, currentCategory.id);
 				toast.success('Saved note');
 				newNoteText = '';
 			}
@@ -79,6 +79,7 @@
 	async function handleWorkspaceSave() {
 		isSavingDescription = true;
 		try {
+			toast.loading('Saving the workspace...');
 			const response = await api.post('/workspaces',
 				{
 					description: description,
@@ -89,6 +90,7 @@
 			workspace.description = response.data.description;
 
 			isEditingDescription = false;
+			toast.success("Saved the workspace");
 		} catch (err) {
 			toast.error(err.message);
 		} finally {
@@ -187,7 +189,7 @@
 				>
 					<div class="flex flex-row items-center gap-2">
 						<Paintbrush size={16} />
-						Clear All
+						Clear All Notes
 					</div>
 				</AlertDialogTrigger>
 				<AlertDialogContent
@@ -198,7 +200,7 @@
 					}}
 				>
 					<AlertDialogHeader>Are you sure?</AlertDialogHeader>
-					<AlertDialogDescription>This action cannot be undone</AlertDialogDescription>
+					<AlertDialogDescription>This will clear all notes from the current <u>workspace</u><br/>This action cannot be undone</AlertDialogDescription>
 					<AlertDialogFooter>
 						<AlertDialogCancel>Cancel</AlertDialogCancel>
 						<AlertDialogAction

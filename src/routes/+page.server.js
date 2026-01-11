@@ -1,7 +1,8 @@
 import { redirect } from '@sveltejs/kit';
 import { get } from '$lib/server/services/workspace.service.js';
 import { generateJws } from '$lib/server/services/jws.service.js';
-import { JWT_EXPIRY } from '$env/static/private';
+
+const jwtExpiry = parseInt(process.env.JWT_EXPIRY);
 
 export async function load({ locals }) {
 	if (locals.workspace?.passphrase) {
@@ -21,7 +22,7 @@ export const actions = {
 
 		cookies.set('authentication', generateJws(dbWorkspace), {
 			path: '/',
-			expires: new Date(Date.now() + parseInt(JWT_EXPIRY)),
+			expires: new Date(Date.now() + jwtExpiry),
 			sameSite: 'strict'
 		});
 

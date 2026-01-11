@@ -25,9 +25,19 @@ function createCategoriesStore() {
 		},
 
 		addCategory: async (category) => {
+			let existingCategory = null;
+			update((categories) => {
+				existingCategory = categories.filter(c => c.label === category.label);
+				return categories;
+			})
+
+			if(existingCategory.length > 0) return existingCategory;
+
 			const { data } = await api.post('/categories', category);
 
 			update((categories) => [...categories, data]);
+
+			return data;
 		},
 
 		editCategory: async (category) => {

@@ -47,7 +47,7 @@ export async function POST({ request, locals }) {
 
 	const note = await request.json();
 
-	if (!note.id || !note.text) {
+	if (!note.text) {
 		throw error(400, 'Invalid note data');
 	}
 

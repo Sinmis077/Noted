@@ -110,8 +110,8 @@ function addWorkspaceReferences(db, migrationLabel) {
 				createdAt       TEXT    NOT NULL,
 				completedAt     TEXT,
 				note_order      INTEGER NOT NULL,
-				category_label  TEXT             DEFAULT NULL REFERENCES categories (label),
-				UNIQUE (passphrase, id)
+				category_id     TEXT             DEFAULT NULL REFERENCES categories (id),
+				CONSTRAINT notes_unique_per_workspace UNIQUE (passphrase, id)
 			);
 
 			INSERT INTO notes_new (id, passphrase, text, backgroundColor, isCompleted, createdAt, completedAt, note_order)

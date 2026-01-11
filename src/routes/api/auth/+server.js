@@ -1,7 +1,9 @@
 import { generateJws } from '$lib/server/services/jws.service.js';
 import { get } from '$lib/server/services/workspace.service.js';
 import { error, fail, redirect } from '@sveltejs/kit';
-import { JWT_EXPIRY } from '$env/static/private';
+
+const jwtExpiry = parseInt(process.env.JWT_EXPIRY);
+
 
 export async function GET({ request }) {
 	const token = request.headers.get('authorization');
@@ -21,7 +23,7 @@ export async function POST({ request, cookies }) {
 
 		cookies.set('authentication', generateJws(dbWorkspace), {
 			path: '/',
-			expires: new Date(Date.now() + parseInt(JWT_EXPIRY)),
+			expires: new Date(Date.now() + parseInt(jwtExpiry)),
 			sameSite: 'strict'
 		});
 
