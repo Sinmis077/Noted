@@ -2,7 +2,7 @@ export const testNotes = [
 	{
 		id: '1lwx8k2',
 		text: 'Schedule dentist appointment for next month',
-		backgroundColor: 'bg-cyan-200 dark:bg-cyan-900/30',
+		backgroundColor: 'bg-cyan-200 dark:bg-cyan-600',
 		isCompleted: false,
 		createdAt: '2025-12-02T09:15:00.000Z',
 		completedAt: null,

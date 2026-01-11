@@ -1,43 +1,14 @@
 <script>
 	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card/index.js';
-	import { InputGroup, InputGroupInput } from '$lib/components/ui/input-group/index.js';
-	import { api } from '$lib/utils/api.js';
-	import { goto, invalidateAll } from '$app/navigation';
-	import { resolve } from '$app/paths';
+	import {
+		InputGroup,
+		InputGroupInput,
+	} from '$lib/components/ui/input-group/index.js';
+	import { enhance } from '$app/forms';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import { Spinner } from '$lib/components/ui/spinner/index.js';
 
-	let passphrase = '';
-	let error = '';
-	let isLoading = false;
-
-	function handleKeyDown(e) {
-		if (e.key === 'Enter') {
-			handlePassphraseSubmission();
-		}
-	}
-
-	async function handlePassphraseSubmission() {
-		if (!passphrase.trim()) {
-			error = 'No passphrase found';
-			return;
-		}
-
-		error = '';
-		isLoading = true;
-
-		try {
-			await api.post('/passphrase', { passphrase: passphrase.trim() });
-
-			await invalidateAll();
-
-			await goto(resolve('/notes'));
-		} catch (err) {
-			error = 'Failed to set passphrase, please try again';
-			throw err;
-		} finally {
-			isLoading = false;
-		}
-	}
+	let isLoading = $state(false);
 </script>
 
 <div class="container mx-auto h-screen flex flex-col justify-center items-center">
@@ -47,17 +18,44 @@
 			<CardDescription>Enter a passphrase to access a notes board</CardDescription>
 		</CardHeader>
 		<CardContent>
-			<form onsubmit={handlePassphraseSubmission} noValidate>
+			<form
+				method="POST"
+				action="?/login"
+				use:enhance={() => {
+					isLoading = true;
+					return async ({ update }) => {
+						isLoading = false;
+						await update();
+					}
+				}}
+				noValidate>
 				<InputGroup>
 					<InputGroupInput
+						name="passphrase"
 						type="text"
-						bind:value={passphrase}
-						onkeydown={handleKeyDown}
 						placeholder="Enter your passphrase"
 					/>
+<!--				</InputGroup>-->
+<!--				<InputGroup class="mt-4">-->
+<!--					<InputGroupInput-->
+<!--						name="password"-->
+<!--						type="password"-->
+<!--						placeholder="Enter your password"-->
+<!--					/>-->
+<!--					<InputGroupAddon align="inline-end">-->
+<!--						<InputGroupText class="italic">Optional</InputGroupText>-->
+<!--					</InputGroupAddon>-->
 				</InputGroup>
-				<Button type="submit" class="mt-5" size="lg">Submit</Button>
+				<Button type="submit" class="mt-5" size="lg" disabled={isLoading}>
+					{#if isLoading}
+						<Spinner />
+						Processing...
+					{:else}
+						Submit
+					{/if}
+				</Button>
 			</form>
 		</CardContent>
 	</Card>
 </div>
+

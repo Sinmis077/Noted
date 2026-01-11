@@ -1,28 +1,12 @@
 <script>
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
-	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
-	import Loading from '$lib/components/loading.svelte';
 	import { ModeWatcher, toggleMode } from 'mode-watcher';
 	import { Moon, Sun } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Toaster } from '$lib/components/ui/sonner/index.js';
 
-	let { data, children } = $props();
-
-	let hasPassphrase = $derived(data.hasPassphrase);
-
-	let isLoading = $state(true);
-
-	onMount(async () => {
-		if (hasPassphrase) {
-			await goto(resolve('/notes'));
-		} else await goto(resolve('/'));
-
-		isLoading = false;
-	});
+	let { children } = $props();
 </script>
 
 <svelte:head>
@@ -46,8 +30,4 @@
 
 <ModeWatcher />
 <Toaster position="top-center" />
-{#if isLoading}
-	<Loading description="Trying to load your passphrase" />
-{:else}
-	{@render children()}
-{/if}
+{@render children()}

@@ -4,16 +4,14 @@ export default function migrate(db) {
 	backgroundColorMigration(db);
 	backgroundColorMigrationTwo(db);
 
+	addWorkspaceReferences(db, "addWorkspaceReferences_migration_26-12-2025");
+
 	console.log('Migration completed');
 }
 
 // Data migration methods
 function backgroundColorMigration(db) {
 	let migrationLabel = 'backgroundColor_migration_8-12-2025';
-
-	console.log(`Attempting to conduct ${migrationLabel} migration`);
-
-	if (db.prepare(`SELECT * FROM migrations WHERE label = ?`).get(migrationLabel)) return;
 
 	const CONVERSION_DATA = {
 		'bg-red-100': 'bg-red-200 dark:bg-red-600',
@@ -44,10 +42,6 @@ function backgroundColorMigration(db) {
 function backgroundColorMigrationTwo(db) {
 	let migrationLabel = 'backgroundColor_migration_9-12-2025';
 
-	console.log(`Attempting to conduct ${migrationLabel} migration`);
-
-	if (db.prepare(`SELECT * FROM migrations WHERE label = ?`).get(migrationLabel)) return;
-
 	const CONVERSION_DATA = {
 		'bg-red-200 dark:bg-red-600': 'bg-powder-blush',
 		'bg-amber-200 dark:bg-amber-600': 'bg-apricot-cream',
@@ -68,9 +62,14 @@ function backgroundColorMigrationTwo(db) {
 	};
 
 	convertBackgroundColors(db, migrationLabel, CONVERSION_DATA);
+
 }
 
 function convertBackgroundColors(db, migrationLabel, conversionData) {
+	if (db.prepare(`SELECT * FROM migrations WHERE label = ?`).get(migrationLabel)) return;
+
+	console.log(`Attempting to conduct ${migrationLabel} migration`);
+
 	const stmt = db.prepare('UPDATE notes SET backgroundColor = ? WHERE backgroundColor = ?');
 
 	let updateCount = 0;
@@ -80,10 +79,65 @@ function convertBackgroundColors(db, migrationLabel, conversionData) {
 	}
 
 	if (updateCount > 0) {
-		db.prepare('INSERT INTO migrations(label) VALUES (?)').run(migrationLabel);
+		db.exec(`INSERT INTO migrations(label) VALUES (${migrationLabel})`);
 
 		console.log(`Updated ${updateCount} note(s) with new color format`);
+		console.log(`Completed ${migrationLabel}`);
 	} else {
 		console.log('No notes found to be migrated');
 	}
+}
+
+function addWorkspaceReferences(db, migrationLabel) {
+	if (db.prepare(`SELECT * FROM migrations WHERE label = ?`).get(migrationLabel)) return;
+
+	if(db.pragma('user_version', { simple: true }) > 3) return;
+
+	const migrate = db.transaction(() => {
+		db.exec(`
+      INSERT OR IGNORE INTO workspaces(passphrase)
+      SELECT DISTINCT passphrase FROM notes;
+    `);
+
+		db.exec(`
+			CREATE TABLE notes_new
+			(
+				id              TEXT PRIMARY KEY,
+				passphrase      TEXT    NOT NULL REFERENCES workspaces (passphrase),
+				text            TEXT    NOT NULL,
+				backgroundColor TEXT    NOT NULL,
+				isCompleted     INTEGER NOT NULL DEFAULT 0,
+				createdAt       TEXT    NOT NULL,
+				completedAt     TEXT,
+				note_order      INTEGER NOT NULL,
+				category_id     TEXT             DEFAULT NULL REFERENCES categories (id),
+				CONSTRAINT notes_unique_per_workspace UNIQUE (passphrase, id)
+			);
+
+			INSERT INTO notes_new (id, passphrase, text, backgroundColor, isCompleted, createdAt, completedAt, note_order)
+			SELECT id,
+						 passphrase,
+						 text,
+						 backgroundColor,
+						 isCompleted,
+						 createdAt,
+						 completedAt,
+						 note_order
+			FROM notes;
+
+			DROP TABLE notes;
+
+			ALTER TABLE notes_new
+				RENAME TO notes;
+
+			CREATE INDEX IF NOT EXISTS idx_passphrase ON notes (passphrase);
+		`);
+
+		db.pragma('user_version = 4');
+		db.prepare('INSERT INTO migrations(label) VALUES (?)').run(migrationLabel);
+	});
+
+	migrate();
+
+	console.log(`Completed ${migrationLabel}`);
 }

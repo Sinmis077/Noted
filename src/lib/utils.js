@@ -5,4 +5,10 @@ export function cn(...inputs) {
 	return twMerge(clsx(inputs));
 }
 
+export function toTitleCase(str) {
+	return str.toLowerCase().replace(/(?:^|\s)\w/g, function (match) {
+		return match.toUpperCase();
+	});
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
