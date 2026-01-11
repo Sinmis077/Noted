@@ -9,7 +9,7 @@ const COLORS = [
 	'bg-electric-aqua',
 	'bg-baby-blue-ice',
 	'bg-periwinkle',
-	'bg-mauve',
+	'bg-mauve'
 ];
 
 function generateId() {
@@ -26,9 +26,9 @@ function createNotesStore() {
 	return {
 		subscribe,
 
-		loadNotes: async () => {
+		loadNotes: async (category) => {
 			try {
-				const { data } = await api.get('/notes');
+				const { data } = await api.get('/notes', { params: { category } });
 				set(data);
 			} catch (err) {
 				set([]);
@@ -36,7 +36,7 @@ function createNotesStore() {
 			}
 		},
 
-		addNote: async (text) => {
+		addNote: async (text, category) => {
 			let currentLength = 0;
 			update((notes) => {
 				currentLength = notes.length;
@@ -50,36 +50,19 @@ function createNotesStore() {
 				isCompleted: false,
 				createdAt: new Date().toISOString(),
 				completedAt: null,
+				category: category !== 'to-dos' ? category : null,
 				order: currentLength
 			};
 
-			try {
-				const { data } = await api.post('/notes', newNote);
+			const { data } = await api.post('/notes', newNote);
 
-				update((notes) => [...notes, data]);
-			} catch (err) {
-				throw err;
-			}
+			update((notes) => [...notes, data]);
 		},
 
 		editNote: async (note) => {
-			try {
-				const { data } = await api.put(`/notes/${note.id}`, note);
+			const { data } = await api.put(`/notes/${note.id}`, note);
 
-				update((notes) => notes.map((oldNote) => (oldNote.id === note.id ? data : oldNote)));
-			} catch (err) {
-				throw err;
-			}
-		},
-
-		deleteNote: async (id) => {
-			try {
-				await api.delete(`/notes/${id}`);
-
-				update((notes) => notes.filter((note) => note.id !== id));
-			} catch (err) {
-				throw err;
-			}
+			update((notes) => notes.map((oldNote) => (oldNote.id === note.id ? data : oldNote)));
 		},
 
 		toggleNoteComplete: async (id) => {
@@ -99,24 +82,23 @@ function createNotesStore() {
 				completedAt: !noteToUpdate.isCompleted ? new Date().toISOString() : null
 			};
 
-			try {
-				const { data } = await api.put(`/notes/${id}`, updatedNote);
+			const { data } = await api.put(`/notes/${id}`, updatedNote);
 
-				update((notes) => notes.map((note) => (note.id === id ? data : note)));
-			} catch (err) {
-				throw err;
-			}
+			update((notes) => notes.map((note) => (note.id === id ? data : note)));
+		},
+
+		deleteNote: async (id) => {
+			await api.delete(`/notes/${id}`);
+
+			update((notes) => notes.filter((note) => note.id !== id));
 		},
 
 		clearAll: async () => {
-			try {
-				await api.delete(`/notes`);
-				update(() => {
-					return [];
-				});
-			} catch (err) {
-				throw err;
-			}
+			await api.delete(`/notes`);
+
+			update(() => {
+				return [];
+			});
 		}
 	};
 }

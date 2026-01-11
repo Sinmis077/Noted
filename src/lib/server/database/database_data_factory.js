@@ -1,4 +1,3 @@
-import { getDB } from '$lib/server/database.js';
 import { testNotes } from '$lib/server/data/notes_test_data.js';
 
 const passphrase = 'test';
@@ -11,7 +10,7 @@ export function generateNotes(db) {
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 	`);
 
-	testNotes.forEach(note => {
+	testNotes.forEach((note) => {
 		stmt.run(
 			note.id,
 			passphrase,
@@ -21,6 +20,6 @@ export function generateNotes(db) {
 			note.createdAt,
 			note.completedAt,
 			note.order
-		)
-	})
+		);
+	});
 }

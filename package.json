@@ -15,7 +15,7 @@
 		"@eslint/compat": "^1.4.0",
 		"@eslint/js": "^9.39.1",
 		"@internationalized/date": "^3.10.0",
-		"@lucide/svelte": "^0.544.0",
+		"@lucide/svelte": "^0.561.0",
 		"@sveltejs/adapter-auto": "^7.0.0",
 		"@sveltejs/adapter-node": "^5.4.0",
 		"@sveltejs/kit": "^2.48.5",
@@ -42,8 +42,10 @@
 	},
 	"dependencies": {
 		"axios": "^1.13.2",
+		"bcrypt": "^6.0.0",
 		"better-sqlite3": "^12.5.0",
 		"bits-ui": "^2.14.4",
+		"jsonwebtoken": "^9.0.3",
 		"lucide-svelte": "^0.556.0",
 		"mode-watcher": "^1.1.0",
 		"svelte-bricks": "^0.3.2"

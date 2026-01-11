@@ -25,8 +25,3 @@ export async function GET({ cookies }) {
 		hasPassphrase: Boolean(passphrase)
 	});
 }
-
-export async function DELETE({ cookies }) {
-	cookies.delete('passphrase', { path: '/' });
-	return json({ success: true });
-}

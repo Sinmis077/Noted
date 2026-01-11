@@ -9,7 +9,6 @@
 		DrawerTitle,
 		DrawerTrigger
 	} from '$lib/components/ui/drawer/index.js';
-
 </script>
 
 <Drawer>
