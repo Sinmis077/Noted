@@ -1,6 +1,6 @@
 import '$lib/server/database/database.js';
 import { getFromPassphrase } from '$lib/server/services/workspace.service.js';
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { extractPayload } from '$lib/server/services/jws.service.js';
 
 console.log('Initialized server...');
@@ -23,8 +23,11 @@ export async function handle({ event, resolve }) {
 	const token = event.cookies.get('noted-authentication');
 
 	const payload = extractPayload(token);
+
 	if (!payload) {
-		throw redirect(303, '/');
+		if(event.url.pathname.startsWith('/api')) {
+			throw error(403, "You are unauthorized");
+		} else throw redirect(303, '/');
 	}
 
 	const { passphrase } = payload.data;

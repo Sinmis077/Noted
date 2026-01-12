@@ -1,18 +1,18 @@
 import { generateJws } from '$lib/server/services/jws.service.js';
 import { get } from '$lib/server/services/workspace.service.js';
-import { error, fail, redirect } from '@sveltejs/kit';
+import { error, fail, json } from '@sveltejs/kit';
 
 const jwtExpiry = parseInt(process.env.JWT_EXPIRY);
 
 
-export async function GET({ request }) {
-	const token = request.headers.get('authorization');
+export async function GET({ cookies }) {
+	const token = await cookies.get("noted-authentication");
 
 	if (!token) {
 		return error(401, 'Not authenticated');
 	}
 
-	return new Response();
+	return json("Authenticated");
 }
 
 export async function POST({ request, cookies }) {
@@ -23,21 +23,18 @@ export async function POST({ request, cookies }) {
 
 		cookies.set('noted-authentication', generateJws(dbWorkspace), {
 			path: '/',
-			expires: new Date(Date.now() + parseInt(jwtExpiry)),
+			expires: new Date(Date.now() + jwtExpiry),
 			sameSite: 'strict'
 		});
 
-		// noinspection ExceptionCaughtLocallyJS
-		throw redirect(303, '/notes');
-	} catch (err) {
-		if (err.status === 303) throw err;
-
+		return json("Authenticated");
+	} catch {
 		throw fail(401, { error: 'Invalid passphrase' });
 	}
 }
 
 export async function DELETE({ cookies }) {
-	cookies.delete('authentication', { path: '/' });
+	cookies.delete('noted-authentication', { path: '/' });
 
-	throw redirect(303, '/');
+	return new Response(null, { status: 204 });
 }
