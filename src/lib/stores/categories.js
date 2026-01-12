@@ -41,17 +41,17 @@ function createCategoriesStore() {
 		},
 
 		editCategory: async (category) => {
-			const { data } = await api.put(`/categories/${category.label}`, category);
+			const { data } = await api.put(`/categories/${category.id}`, category);
 
 			update((categories) =>
-				categories.map((oldCategory) => (oldCategory.label === category.label ? data : oldCategory))
+				categories.map((oldCategory) => (oldCategory.id === category.id ? data : oldCategory))
 			);
 		},
 
-		deleteCategory: async (label) => {
-			await api.delete(`/categories/${label}`);
+		deleteCategory: async (id) => {
+			await api.delete(`/categories/${id}`);
 
-			update((categories) => categories.filter((category) => category.label !== label));
+			update((categories) => categories.filter((category) => category.id !== id));
 		}
 	};
 }
