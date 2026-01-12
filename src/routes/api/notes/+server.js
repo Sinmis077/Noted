@@ -8,7 +8,7 @@ import {
 
 export async function GET({ url, locals }) {
 	const passphrase = locals.workspace.passphrase;
-	const params = url.searchParams;
+	const searchParams = url.searchParams;
 
 	if (!passphrase) {
 		return json([]);
@@ -17,17 +17,17 @@ export async function GET({ url, locals }) {
 	try {
 		let notes = [];
 
-		if (!params || params.get('category') === 'to-dos') {
+		if (searchParams.size === 0 || searchParams.get('category') === 'to-dos') {
 			notes = getNotesByPassphrase(passphrase).filter(note => note.isCompleted === false);
-		} else if(params.get('category') !== 'completed') {
-			notes = getNotesByPassphraseAndCategory(passphrase, params.get('category'));
+		} else if(searchParams.get('category') !== 'completed') {
+			notes = getNotesByPassphraseAndCategory(passphrase, searchParams.get('category'));
 		} else {
 			if (notes.length > 0) {
-				notes = notes.filter((note) => note.isCompleted === params?.get('completed'));
+				notes = notes.filter((note) => note.isCompleted === searchParams?.get('completed'));
 			} else {
 				notes = getNotesByPassphrase(passphrase).filter(
 					(note) =>
-						note.isCompleted === (params?.get('completed') ?? params?.get('category') !== null)
+						note.isCompleted === (searchParams?.get('completed') ?? searchParams?.get('category') !== null)
 				);
 			}
 		}
