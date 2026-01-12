@@ -20,7 +20,7 @@ export const actions = {
 
 		let dbWorkspace = await get(workspace);
 
-		cookies.set('authentication', generateJws(dbWorkspace), {
+		cookies.set('noted-authentication', generateJws(dbWorkspace), {
 			path: '/',
 			expires: new Date(Date.now() + jwtExpiry),
 			sameSite: 'strict'

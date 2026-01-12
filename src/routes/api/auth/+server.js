@@ -21,7 +21,7 @@ export async function POST({ request, cookies }) {
 
 		let dbWorkspace = await get(workspace);
 
-		cookies.set('authentication', generateJws(dbWorkspace), {
+		cookies.set('noted-authentication', generateJws(dbWorkspace), {
 			path: '/',
 			expires: new Date(Date.now() + parseInt(jwtExpiry)),
 			sameSite: 'strict'

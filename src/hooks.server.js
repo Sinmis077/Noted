@@ -20,7 +20,7 @@ export async function handle({ event, resolve }) {
 		return resolve(event);
 	}
 
-	const token = event.cookies.get('authentication');
+	const token = event.cookies.get('noted-authentication');
 
 	const payload = extractPayload(token);
 	if (!payload) {
@@ -30,7 +30,7 @@ export async function handle({ event, resolve }) {
 	const { passphrase } = payload.data;
 
 	if (!passphrase) {
-		event.cookies.delete('authentication', { path: '/' });
+		event.cookies.delete('noted-authentication', { path: '/' });
 	}
 
 	const workspace = await getFromPassphrase(passphrase);
