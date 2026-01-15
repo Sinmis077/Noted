@@ -25,7 +25,7 @@
 		<Moon size={24} class="dark:block hidden" />
 	</Button>
 
-	<img class="w-15 md:block hidden" src="./icon.png" alt="Icon" />
+	<img class="w-15 md:block hidden" src="/icon.png" alt="Icon" />
 </div>
 
 <ModeWatcher />

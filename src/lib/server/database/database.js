@@ -3,8 +3,9 @@ import { dev } from '$app/environment';
 import { mkdirSync } from 'fs';
 import { dirname } from 'path';
 import migrate from '$lib/server/database/database_migration.js';
+import { logger } from '$lib/server/logger.js';
 
-const dbPath = dev ? 'notes-dev.db' : process.env.DATABASE_PATH ?? './data/notes.db';
+const dbPath = dev ? 'notes-dev.db' : (process.env.DATABASE_PATH ?? './data/notes.db');
 
 const dbVersion = 4;
 
@@ -17,7 +18,12 @@ if (dir !== '.') {
 console.log('Initializing database...');
 
 const db = new Database(dbPath, {
-	verbose: dev ? console.log : undefined
+	verbose: dev
+		? (message) => {
+				const cleanedSql = message.replace(/\n\t/g, ' ').replace(/\s+/g, ' ').trim();
+				logger.debug(cleanedSql);
+			}
+		: undefined
 });
 
 db.pragma('journal_mode = WAL');
@@ -73,6 +79,6 @@ if (db.pragma('user_version', { simple: true }) < dbVersion) {
 	migrate(db);
 }
 
-console.log('Completed database initialization...');
+logger.info('Completed database initialization...');
 
 export default db;

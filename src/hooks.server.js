@@ -1,11 +1,12 @@
 import '$lib/server/database/database.js';
 import { getFromPassphrase } from '$lib/server/services/workspace.service.js';
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { extractPayload } from '$lib/server/services/jws.service.js';
+import { logger } from '$lib/server/logger.js';
 
-console.log('Initialized server...');
+logger.info('Initialized server...');
 
-const publicRoutes = ['/', '/api/auth'];
+const publicRoutes = ['/', '/api/auth', '/notes/'];
 
 function isPublicRoute(dest) {
 	if (dest === '/') {
@@ -20,17 +21,24 @@ export async function handle({ event, resolve }) {
 		return resolve(event);
 	}
 
-	const token = event.cookies.get('authentication');
+	logger.trace('Challenging logged in user');
+
+	const token = event.cookies.get('noted-authentication');
+	logger.trace(`Received ${token}`);
 
 	const payload = extractPayload(token);
+	logger.trace(`The token payload is ${JSON.stringify(payload)}`);
+
 	if (!payload) {
-		throw redirect(303, '/');
+		if(event.url.pathname.startsWith('/api')) {
+			throw error(403, "You are unauthorized");
+		} else throw redirect(303, '/');
 	}
 
 	const { passphrase } = payload.data;
 
 	if (!passphrase) {
-		event.cookies.delete('authentication', { path: '/' });
+		event.cookies.delete('noted-authentication', { path: '/' });
 	}
 
 	const workspace = await getFromPassphrase(passphrase);

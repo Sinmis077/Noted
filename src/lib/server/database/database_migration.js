@@ -1,12 +1,14 @@
+import { logger } from '$lib/server/logger.js';
+
 export default function migrate(db) {
-	console.log(`Starting version migration`);
+	logger.info(`Starting version migration`);
 
 	backgroundColorMigration(db);
 	backgroundColorMigrationTwo(db);
 
-	addWorkspaceReferences(db, "addWorkspaceReferences_migration_26-12-2025");
+	addWorkspaceReferences(db, 'addWorkspaceReferences_migration_26-12-2025');
 
-	console.log('Migration completed');
+	logger.info('Migration completed');
 }
 
 // Data migration methods
@@ -62,42 +64,47 @@ function backgroundColorMigrationTwo(db) {
 	};
 
 	convertBackgroundColors(db, migrationLabel, CONVERSION_DATA);
-
 }
 
 function convertBackgroundColors(db, migrationLabel, conversionData) {
 	if (db.prepare(`SELECT * FROM migrations WHERE label = ?`).get(migrationLabel)) return;
 
-	console.log(`Attempting to conduct ${migrationLabel} migration`);
+	logger.info(`Attempting to conduct ${migrationLabel} migration`);
 
 	const stmt = db.prepare('UPDATE notes SET backgroundColor = ? WHERE backgroundColor = ?');
 
 	let updateCount = 0;
 	for (const [oldBackgroundColor, backgroundColor] of Object.entries(conversionData)) {
+		logger.trace(`Changing notes of bg-color ${oldBackgroundColor} to ${backgroundColor}`);
 		let response = stmt.run(backgroundColor, oldBackgroundColor);
+		logger.trace(`Found and updated ${response.changes} notes`);
 		updateCount += response.changes;
 	}
 
 	if (updateCount > 0) {
 		db.exec(`INSERT INTO migrations(label) VALUES (${migrationLabel})`);
 
-		console.log(`Updated ${updateCount} note(s) with new color format`);
-		console.log(`Completed ${migrationLabel}`);
+		logger.debug(`Updated ${updateCount} note(s) with new color format`);
+		logger.info(`Completed ${migrationLabel}`);
 	} else {
-		console.log('No notes found to be migrated');
+		logger.info('No notes found to be migrated');
 	}
 }
 
 function addWorkspaceReferences(db, migrationLabel) {
 	if (db.prepare(`SELECT * FROM migrations WHERE label = ?`).get(migrationLabel)) return;
 
-	if(db.pragma('user_version', { simple: true }) > 3) return;
+	logger.debug('Beginning the addition of the workspace references');
+
+	if (db.pragma('user_version', { simple: true }) > 3) return;
 
 	const migrate = db.transaction(() => {
 		db.exec(`
       INSERT OR IGNORE INTO workspaces(passphrase)
       SELECT DISTINCT passphrase FROM notes;
     `);
+
+		logger.trace('Created the workspaces from the existing note passphrases');
 
 		db.exec(`
 			CREATE TABLE notes_new
@@ -133,11 +140,14 @@ function addWorkspaceReferences(db, migrationLabel) {
 			CREATE INDEX IF NOT EXISTS idx_passphrase ON notes (passphrase);
 		`);
 
+		logger.trace('Added the category_id column to the notes table');
+
 		db.pragma('user_version = 4');
+		logger.trace(`Bumped database version to 4`);
 		db.prepare('INSERT INTO migrations(label) VALUES (?)').run(migrationLabel);
 	});
 
 	migrate();
 
-	console.log(`Completed ${migrationLabel}`);
+	logger.info(`Completed ${migrationLabel}`);
 }

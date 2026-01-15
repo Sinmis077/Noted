@@ -4,7 +4,9 @@ import { generateJws } from '$lib/server/services/jws.service.js';
 
 const jwtExpiry = parseInt(process.env.JWT_EXPIRY);
 
-export async function load({ locals }) {
+export async function load({ locals, cookies }) {
+	if (cookies.get('noted-authentication')) throw redirect(303, '/notes');
+
 	if (locals.workspace?.passphrase) {
 		throw redirect(303, '/notes');
 	}
@@ -20,7 +22,7 @@ export const actions = {
 
 		let dbWorkspace = await get(workspace);
 
-		cookies.set('authentication', generateJws(dbWorkspace), {
+		cookies.set('noted-authentication', generateJws(dbWorkspace), {
 			path: '/',
 			expires: new Date(Date.now() + jwtExpiry),
 			sameSite: 'strict'

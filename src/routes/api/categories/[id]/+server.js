@@ -26,7 +26,7 @@ export async function DELETE({ params, locals }) {
 		throw error(403, 'You are unauthorized');
 	}
 
-	const success = deleteCategory(workspace, params.label);
+	const success = deleteCategory(workspace, params.id);
 
 	if (!success) {
 		throw error(404, 'Category not found');

@@ -29,13 +29,13 @@ const saveTscn = db.transaction((workspace, category) => {
 		)
 		.get(category.id ?? Date.now().toString(36), category.label, category.description, workspace.passphrase);
 });
-const deleteTscn = db.transaction((workspace, label) => {
-	db.prepare(`UPDATE notes SET category_id = null WHERE category_id = ?`).run(label);
+const deleteTscn = db.transaction((workspace, id) => {
+	db.prepare(`UPDATE notes SET category_id = null WHERE category_id = ?`).run(id);
 
 	return (
 		db
-			.prepare(`DELETE FROM categories WHERE label = ? AND passphrase = ?`)
-			.run(label, workspace.passphrase).changes > 0
+			.prepare(`DELETE FROM categories WHERE id = ? AND passphrase = ?`)
+			.run(id, workspace.passphrase).changes > 0
 	);
 });
 
@@ -52,6 +52,6 @@ export function saveCategory(workspace, category) {
 	return saveTscn(workspace, category);
 }
 
-export function deleteCategory(workspace, label) {
-	return deleteTscn(workspace, label);
+export function deleteCategory(workspace, id) {
+	return deleteTscn(workspace, id);
 }

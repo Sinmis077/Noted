@@ -53,7 +53,7 @@
 		isDeletingCategory = true;
 		try {
 			toast.loading('Deleting...');
-			await categories.deleteCategory(currentCategoryLabel);
+			await categories.deleteCategory(currentCategory.id);
 			toast.success('Successfully deleted category');
 		} catch (err) {
 			toast.error(err.message);
