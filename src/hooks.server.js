@@ -2,10 +2,11 @@ import '$lib/server/database/database.js';
 import { getFromPassphrase } from '$lib/server/services/workspace.service.js';
 import { error, redirect } from '@sveltejs/kit';
 import { extractPayload } from '$lib/server/services/jws.service.js';
+import { logger } from '$lib/server/logger.js';
 
-console.log('Initialized server...');
+logger.info('Initialized server...');
 
-const publicRoutes = ['/', '/api/auth'];
+const publicRoutes = ['/', '/api/auth', '/notes/'];
 
 function isPublicRoute(dest) {
 	if (dest === '/') {
@@ -20,9 +21,13 @@ export async function handle({ event, resolve }) {
 		return resolve(event);
 	}
 
+	logger.trace('Challenging logged in user');
+
 	const token = event.cookies.get('noted-authentication');
+	logger.trace(`Received ${token}`);
 
 	const payload = extractPayload(token);
+	logger.trace(`The token payload is ${JSON.stringify(payload)}`);
 
 	if (!payload) {
 		if(event.url.pathname.startsWith('/api')) {

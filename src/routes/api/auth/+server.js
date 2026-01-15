@@ -4,7 +4,6 @@ import { error, fail, json } from '@sveltejs/kit';
 
 const jwtExpiry = parseInt(process.env.JWT_EXPIRY);
 
-
 export async function GET({ cookies }) {
 	const token = await cookies.get("noted-authentication");
 

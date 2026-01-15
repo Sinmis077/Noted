@@ -4,7 +4,9 @@ import { generateJws } from '$lib/server/services/jws.service.js';
 
 const jwtExpiry = parseInt(process.env.JWT_EXPIRY);
 
-export async function load({ locals }) {
+export async function load({ locals, cookies }) {
+	if (cookies.get('noted-authentication')) throw redirect(303, '/notes');
+
 	if (locals.workspace?.passphrase) {
 		throw redirect(303, '/notes');
 	}
