@@ -18,7 +18,7 @@
 	async function handleSubmit() {
 		try {
 			if (category) {
-				await categories.editCategory({
+				currentCategory = await categories.editCategory({
 					...category,
 					description: description
 				});

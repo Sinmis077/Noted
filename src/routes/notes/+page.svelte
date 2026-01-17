@@ -125,7 +125,7 @@
 					noClose={true}
 					title="Edit {currentCategoryLabel}"
 					description="Add or edit the description">
-		<CategoryForm bind:open={isEditDialogOpen} category={currentCategory} />
+		<CategoryForm bind:open={isEditDialogOpen} category={currentCategory} bind:currentCategory={currentCategory} />
 	</Dialog>
 {/if}
 {#if isDeleteAlertDialogOpen}

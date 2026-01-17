@@ -46,6 +46,8 @@ function createCategoriesStore() {
 			update((categories) =>
 				categories.map((oldCategory) => (oldCategory.id === category.id ? data : oldCategory))
 			);
+
+			return data;
 		},
 
 		deleteCategory: async (id) => {

@@ -10,7 +10,7 @@ export async function PUT({ params, request, locals }) {
 
 	const category = await request.json();
 
-	if (category.label !== params.label) {
+	if (category.id !== params.id) {
 		throw error(400, 'Category label mismatch between URL and body');
 	}
 
