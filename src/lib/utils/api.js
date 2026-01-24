@@ -11,4 +11,12 @@ const api = axios.create({
 	timeout: 5000
 });
 
+api.interceptors.response.use(
+	function onFulfilled(response) {
+		return response;
+	},
+	function onRejected(error) {
+		return Promise.reject(error.response.data);
+	}
+);
 export { api };
