@@ -1,7 +1,7 @@
 {
 	"name": "noted",
 	"private": true,
-	"version": "1.1.1 (Exynos)",
+	"version": "1.1.2 (Exynos)",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",

@@ -4,7 +4,9 @@ import { error, redirect } from '@sveltejs/kit';
 import { extractPayload } from '$lib/server/services/jws.service.js';
 import { logger } from '$lib/server/logger.js';
 
-logger.info('Initialized server...');
+logger.info(`Starting Noted version ${process.env.npm_package_version}`);
+logger.info('Starting backend api...');
+logger.info('Backend API started');
 
 const publicRoutes = ['/', '/api/auth', '/notes/'];
 
