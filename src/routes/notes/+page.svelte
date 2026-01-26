@@ -19,6 +19,9 @@
 	} from '$lib/components/ui/alert-dialog/index.js';
 	import { Spinner } from '$lib/components/ui/spinner/index.js';
 	import { toast } from 'svelte-sonner';
+	import { Switch } from '$lib/components/ui/switch/index.js';
+	import { Label } from '$lib/components/ui/label/index.js';
+	import { readShowCompleted, setShowCompleted } from '$lib/utils/localStorage.js';
 
 	let isLoading = $state(true);
 	let errors = $state(null);
@@ -64,6 +67,12 @@
 			currentCategory = $categories[0];
 		}
 	}
+
+	let showCompleted = $state(readShowCompleted());
+
+	$effect(() => {
+		setShowCompleted(showCompleted);
+	});
 </script>
 
 <div class="p-5">
@@ -110,11 +119,15 @@
 					Completed
 				</TabsTrigger>
 			</TabsList>
+			<span class="flex items-center space-x-2">
+				<Switch id="show-completed" bind:checked={showCompleted} />
+				<Label for="show-completed" class="cursor-pointer">Show completed</Label>
+			</span>
 			<TabsContent value={currentCategoryLabel}>
 				{#if currentCategory.description}
 					<p class="text-primary/77 italic">{currentCategory.description}</p>
 				{/if}
-				<NotesMasonry searchCategoryParam={currentCategoryLabel} />
+				<NotesMasonry {showCompleted} searchCategoryParam={currentCategoryLabel} />
 			</TabsContent>
 		</Tabs>
 	{/if}

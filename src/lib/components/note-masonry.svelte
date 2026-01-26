@@ -7,7 +7,7 @@
 	let isLoading = $state(false);
 	let error = $state(null);
 
-	let { searchCategoryParam } = $props();
+	let { searchCategoryParam, showCompleted } = $props();
 
 	let [minColWidth, maxColWidth, gap] = [250, 400, 12];
 
@@ -37,7 +37,7 @@
 			<Masonry
 				animate={true}
 				duration={100}
-				items={$notes}
+				items={$notes.filter(note => searchCategoryParam === 'completed' || (!note.isCompleted || note.isCompleted === showCompleted))}
 				idKey='id'
 				{minColWidth}
 				{maxColWidth}
