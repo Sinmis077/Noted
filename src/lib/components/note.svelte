@@ -91,7 +91,7 @@
 	}
 </script>
 
-<Card class="aspect-square fade-in text-gray-900 {note.backgroundColor}">
+<Card class="aspect-square fade-in note text-gray-900 {note.backgroundColor}">
 	<CardHeader>
 		<CardAction>
 			<div class="flex flex-row gap-2 items-center">

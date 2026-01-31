@@ -17,7 +17,6 @@ export async function get(workspace) {
 		return dbWorkspace;
 	}
 
-
 	return workspace;
 }
 
