@@ -16,12 +16,12 @@
 	import { Spinner } from '$lib/components/ui/spinner/index.js';
 	import { Popover, PopoverContent, PopoverTrigger } from '$lib/components/ui/popover/index.js';
 
-	let { note } = $props();
+	let { note, resize } = $props();
 
 	let isEditing = $state(false);
 	let isDeleting = $state(false);
 	let isChecking = $state(false);
-	let editingNoteText = $derived(note.text);
+	let editingNoteText = $state('');
 
 	let isDeletingAlertOpen = $state(false);
 
@@ -71,6 +71,7 @@
 	}
 
 	function handleToggleEdit() {
+		editingNoteText = note.text;
 		isEditing = !isEditing;
 	}
 
@@ -91,7 +92,7 @@
 	}
 </script>
 
-<Card class="aspect-square fade-in note text-gray-900 {note.backgroundColor}">
+<Card {@attach resize} class="fade-in h-full text-gray-900 {note.backgroundColor}">
 	<CardHeader>
 		<CardAction>
 			<div class="flex flex-row gap-2 items-center">
