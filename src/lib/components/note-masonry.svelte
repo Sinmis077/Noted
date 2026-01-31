@@ -3,6 +3,8 @@
 	import Loading from '$lib/components/loading.svelte';
 	import { notes } from '$lib/stores/notes.js';
 	import Masonry from 'svelte-bricks';
+	import { resizeNote } from '$lib/utils/resizer.js';
+	import { tick } from 'svelte';
 
 	let isLoading = $state(false);
 	let error = $state(null);
@@ -11,11 +13,11 @@
 
 	let [minColWidth, maxColWidth, gap] = [250, 400, 12];
 
-	$effect(async () => {
+	$effect(() => {
 		isLoading = true;
 
 		try {
-			await notes.loadNotes(searchCategoryParam);
+			notes.loadNotes(searchCategoryParam);
 		} catch (err) {
 			error = err;
 		} finally {
@@ -34,6 +36,12 @@
 {:else}
 	<div>
 		{#if $notes.length > 0}
+			<div class="board">
+				{#each $notes as note (note.id)}
+					<Note class="note" noted-type="note" note={note} />
+				{/each}
+			</div>
+			<!--
 			<Masonry
 				animate={true}
 				duration={100}
@@ -48,8 +56,18 @@
 					<Note {note} />
 				{/snippet}
 			</Masonry>
+			-->
 		{:else}
 			<p>No notes found, add a new one!</p>
 		{/if}
 	</div>
 {/if}
+
+<style type="text/css">
+	.board {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			grid-auto-rows: 10px;
+			gap: var(--gap);
+	}
+</style>
