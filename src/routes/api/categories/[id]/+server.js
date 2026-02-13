@@ -1,5 +1,6 @@
 import { error, json } from '@sveltejs/kit';
 import { deleteCategory, saveCategory } from '$lib/server/database/catagories_repository.js';
+import { sendMessage } from '$lib/server/clientList.js';
 
 export async function PUT({ params, request, locals }) {
 	const workspace = locals.workspace;
@@ -16,6 +17,8 @@ export async function PUT({ params, request, locals }) {
 
 	const updatedCategory = saveCategory(workspace, category);
 
+	sendMessage('updateCategory', updatedCategory);
+
 	return json(updatedCategory);
 }
 
@@ -31,6 +34,8 @@ export async function DELETE({ params, locals }) {
 	if (!success) {
 		throw error(404, 'Category not found');
 	}
+
+	sendMessage('deleteCategory', params.id);
 
 	return new Response(null, { status: 204 });
 }
