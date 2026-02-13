@@ -1,5 +1,6 @@
 import { error, json } from '@sveltejs/kit';
 import { deleteNote, saveNote } from '$lib/server/database/notes_repository.js';
+import { sendMessage } from '$lib/server/clientList.js';
 
 export async function PUT({ params, request, locals }) {
 	const passphrase = locals.workspace.passphrase;
@@ -16,6 +17,8 @@ export async function PUT({ params, request, locals }) {
 
 	const updatedNote = saveNote(passphrase, note);
 
+	sendMessage("updateNote", updatedNote);
+
 	return json(updatedNote);
 }
 
@@ -31,6 +34,8 @@ export async function DELETE({ params, locals }) {
 	if (!success) {
 		throw error(404, 'Note not found');
 	}
+
+	sendMessage('deleteNote', params.id);
 
 	return new Response(null, { status: 204 });
 }

@@ -23,6 +23,8 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { readShowCompleted, setShowCompleted } from '$lib/utils/localStorage.js';
 
+	import SseHandler from '$lib/components/sse-handler.svelte'
+	
 	let isLoading = $state(true);
 	let errors = $state(null);
 
@@ -75,6 +77,7 @@
 	});
 </script>
 
+<SseHandler />
 <div class="p-5">
 	<NoteTopBar {currentCategory} />
 
