@@ -3,6 +3,7 @@ import { getFromPassphrase } from '$lib/server/services/workspace.service.js';
 import { error, redirect } from '@sveltejs/kit';
 import { extractPayload } from '$lib/server/services/jws.service.js';
 import { logger } from '$lib/server/logger.js';
+import { randomUUID } from 'node:crypto';
 
 logger.info(`Starting Noted version ${process.env.npm_package_version}`);
 logger.info('Starting backend api...');
@@ -19,6 +20,15 @@ function isPublicRoute(dest) {
 }
 
 export async function handle({ event, resolve }) {
+	if(!event.cookies.get('session-id')) {
+		event.cookies.set('session-id', randomUUID(), {
+			path: '/',
+			sameSite: 'strict'
+		});
+	}
+
+	event.locals.sessionId = event.cookies.get('session-id');
+
 	if (isPublicRoute(event.url.pathname)) {
 		return resolve(event);
 	}
