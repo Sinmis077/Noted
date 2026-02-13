@@ -1,5 +1,6 @@
 import { error, json } from '@sveltejs/kit';
 import { save } from '$lib/server/services/workspace.service.js';
+import { sendMessage } from '$lib/server/clientList.js';
 
 export async function POST({ request, locals }) {
 	const { description, password } = await request.json();
@@ -11,6 +12,12 @@ export async function POST({ request, locals }) {
 	workspace.password = password;
 
 	save(workspace);
+
+	sendMessage(locals.workspace.passphrase, 'updateWorkspace', {
+		...workspace,
+		description,
+		password: undefined
+	});
 
 	return json({
 		...workspace,

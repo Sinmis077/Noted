@@ -17,7 +17,7 @@ export async function PUT({ params, request, locals }) {
 
 	const updatedCategory = saveCategory(workspace, category);
 
-	sendMessage('updateCategory', updatedCategory);
+	sendMessage(locals.workspace.passphrase, 'updateCategory', updatedCategory);
 
 	return json(updatedCategory);
 }
@@ -35,7 +35,7 @@ export async function DELETE({ params, locals }) {
 		throw error(404, 'Category not found');
 	}
 
-	sendMessage('deleteCategory', params.id);
+	sendMessage(locals.workspace.passphrase, 'deleteCategory', params.id);
 
 	return new Response(null, { status: 204 });
 }

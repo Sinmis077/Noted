@@ -54,7 +54,7 @@ export async function POST({ request, locals }) {
 
 	const savedNote = saveNote(passphrase, note);
 
-	sendMessage('newNote', savedNote);
+	sendMessage(locals.workspace.passphrase, 'newNote', savedNote);
 
 	return json(savedNote, { status: 201 });
 }
@@ -72,7 +72,7 @@ export async function DELETE({ locals }) {
 		throw error(404, `Couldn't find the notes`);
 	}
 
-	sendMessage("clearAllNotes", true);
+	sendMessage(locals.workspace.passphrase, 'clearAllNotes', true);
 
 	return new Response(null, { status: 204 });
 }

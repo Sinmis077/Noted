@@ -51,7 +51,13 @@ function createNotesStore() {
 
 			const { data } = await api.post('/notes', newNote);
 
-			update((notes) => [...notes, data]);
+			update((notes) => {
+				if (notes.find((existingNote) => existingNote.id === data.id)) {
+					return notes;
+				}
+
+				return [...notes, data];
+			});
 		},
 
 		editNote: async (note) => {

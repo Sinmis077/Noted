@@ -17,7 +17,7 @@ export async function PUT({ params, request, locals }) {
 
 	const updatedNote = saveNote(passphrase, note);
 
-	sendMessage("updateNote", updatedNote);
+	sendMessage(locals.workspace.passphrase, 'updateNote', updatedNote);
 
 	return json(updatedNote);
 }
@@ -35,7 +35,7 @@ export async function DELETE({ params, locals }) {
 		throw error(404, 'Note not found');
 	}
 
-	sendMessage('deleteNote', params.id);
+	sendMessage(locals.workspace.passphrase, 'deleteNote', params.id);
 
 	return new Response(null, { status: 204 });
 }

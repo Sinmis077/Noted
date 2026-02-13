@@ -28,7 +28,7 @@ export async function POST({ request, locals }) {
 
 	let savedCategory = await saveCategory(workspace, category);
 
-	sendMessage('newCategory', savedCategory);
+	sendMessage(locals.workspace.passphrase, 'newCategory', savedCategory);
 
 	return json(savedCategory);
 }

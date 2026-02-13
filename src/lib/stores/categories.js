@@ -11,14 +11,14 @@ function createCategoriesStore() {
 			try {
 				const { data } = await api.get('/categories');
 				set([
-					{ label: 'to-dos', description: 'Things left to-do' },
+					{ id: 1, label: 'to-dos', description: 'Things left to-do' },
 					...data,
-					{ label: 'completed', description: "I've completed these, I should be proud!" }
+					{ id: 2, label: 'completed', description: "I've completed these, I should be proud!" }
 				]);
 			} catch (err) {
 				set([
-					{ label: 'to-dos', description: 'Things left to-do' },
-					{ label: 'completed', description: "I've completed these, I should be proud!" }
+					{ id: 1, label: 'to-dos', description: 'Things left to-do' },
+					{ id: 2, label: 'completed', description: "I've completed these, I should be proud!" }
 				]);
 				throw err;
 			}
@@ -35,7 +35,12 @@ function createCategoriesStore() {
 
 			const { data } = await api.post('/categories', category);
 
-			update((categories) => [...categories, data]);
+			update((categories) => {
+				if (categories.find((existingCategory) => existingCategory.id === data.id))
+					return categories;
+
+				return [...categories, data];
+			});
 
 			return data;
 		},
