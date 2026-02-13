@@ -11,14 +11,14 @@ function createCategoriesStore() {
 			try {
 				const { data } = await api.get('/categories');
 				set([
-					{ label: 'to-dos', description: 'Things left to-do' },
+					{ id: 1, label: 'to-dos', description: 'Things left to-do' },
 					...data,
-					{ label: 'completed', description: "I've completed these, I should be proud!" }
+					{ id: 2, label: 'completed', description: "I've completed these, I should be proud!" }
 				]);
 			} catch (err) {
 				set([
-					{ label: 'to-dos', description: 'Things left to-do' },
-					{ label: 'completed', description: "I've completed these, I should be proud!" }
+					{ id: 1, label: 'to-dos', description: 'Things left to-do' },
+					{ id: 2, label: 'completed', description: "I've completed these, I should be proud!" }
 				]);
 				throw err;
 			}
@@ -27,15 +27,20 @@ function createCategoriesStore() {
 		addCategory: async (category) => {
 			let existingCategory = null;
 			update((categories) => {
-				existingCategory = categories.filter(c => c.label === category.label);
+				existingCategory = categories.filter((c) => c.label === category.label);
 				return categories;
-			})
+			});
 
-			if(existingCategory.length > 0) return existingCategory;
+			if (existingCategory.length > 0) return existingCategory;
 
 			const { data } = await api.post('/categories', category);
 
-			update((categories) => [...categories, data]);
+			update((categories) => {
+				if (categories.find((existingCategory) => existingCategory.id === data.id))
+					return categories;
+
+				return [...categories, data];
+			});
 
 			return data;
 		},
@@ -46,11 +51,32 @@ function createCategoriesStore() {
 			update((categories) =>
 				categories.map((oldCategory) => (oldCategory.id === category.id ? data : oldCategory))
 			);
+
+			return data;
 		},
 
 		deleteCategory: async (id) => {
 			await api.delete(`/categories/${id}`);
 
+			update((categories) => categories.filter((category) => category.id !== id));
+		},
+
+		addSSECategory: (category) => {
+			update((categories) => {
+				if (categories.find((existingCategory) => existingCategory.id === category.id))
+					return categories;
+
+				return [...categories, category];
+			});
+		},
+
+		updateSSECategory(category) {
+			update((categories) =>
+				categories.map((oldCategory) => (oldCategory.id === category.id ? category : oldCategory))
+			);
+		},
+
+		deleteSSECategory: (id) => {
 			update((categories) => categories.filter((category) => category.id !== id));
 		}
 	};

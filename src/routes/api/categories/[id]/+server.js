@@ -1,5 +1,6 @@
 import { error, json } from '@sveltejs/kit';
 import { deleteCategory, saveCategory } from '$lib/server/database/catagories_repository.js';
+import { sendMessage } from '$lib/server/clientList.js';
 
 export async function PUT({ params, request, locals }) {
 	const workspace = locals.workspace;
@@ -10,11 +11,13 @@ export async function PUT({ params, request, locals }) {
 
 	const category = await request.json();
 
-	if (category.label !== params.label) {
+	if (category.id !== params.id) {
 		throw error(400, 'Category label mismatch between URL and body');
 	}
 
 	const updatedCategory = saveCategory(workspace, category);
+
+	sendMessage(locals.workspace.passphrase, 'updateCategory', updatedCategory);
 
 	return json(updatedCategory);
 }
@@ -31,6 +34,8 @@ export async function DELETE({ params, locals }) {
 	if (!success) {
 		throw error(404, 'Category not found');
 	}
+
+	sendMessage(locals.workspace.passphrase, 'deleteCategory', params.id);
 
 	return new Response(null, { status: 204 });
 }

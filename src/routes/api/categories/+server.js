@@ -3,6 +3,7 @@ import {
 	getCategoriesByPassphrase,
 	saveCategory
 } from '$lib/server/database/catagories_repository.js';
+import { sendMessage } from '$lib/server/clientList.js';
 
 export async function GET({ locals }) {
 	return json(getCategoriesByPassphrase(locals.workspace?.passphrase));
@@ -25,5 +26,9 @@ export async function POST({ request, locals }) {
 		category.description = null;
 	}
 
-	return json(saveCategory(workspace, category));
+	let savedCategory = await saveCategory(workspace, category);
+
+	sendMessage(locals.workspace.passphrase, 'newCategory', savedCategory);
+
+	return json(savedCategory);
 }

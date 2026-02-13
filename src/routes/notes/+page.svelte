@@ -19,14 +19,20 @@
 	} from '$lib/components/ui/alert-dialog/index.js';
 	import { Spinner } from '$lib/components/ui/spinner/index.js';
 	import { toast } from 'svelte-sonner';
+	import { Switch } from '$lib/components/ui/switch/index.js';
+	import { Label } from '$lib/components/ui/label/index.js';
+	import { readShowCompleted, setShowCompleted } from '$lib/utils/localStorage.js';
 
+	import SseHandler from '$lib/components/sse-handler.svelte'
+	import { page } from '$app/state';
+	
 	let isLoading = $state(true);
 	let errors = $state(null);
 
 	onMount(async () => {
 		try {
 			await categories.loadCategories();
-			currentCategory = $categories[0];
+			currentCategoryId = $categories[0].id;
 		} catch (e) {
 			errors = e.message;
 		} finally {
@@ -34,8 +40,9 @@
 		}
 	});
 
-	let currentCategory = $state(null);
-	let currentCategoryLabel = $derived(currentCategory?.label);
+	let currentCategoryId = $state(null);
+
+	let currentCategory = $derived($categories.find((cat) => cat.id === currentCategoryId) ?? $categories[0]);
 
 	let isDialogOpen = $state(false);
 	let isEditDialogOpen = $state(false);
@@ -44,16 +51,16 @@
 	let isDeletingCategory = $state(false);
 
 	function changeTab(category) {
-		if (currentCategory.label === category.label) return;
+		if (currentCategoryId === category.id) return;
 
-		currentCategory = category;
+		currentCategoryId = category.id;
 	}
 
 	async function handleDelete() {
 		isDeletingCategory = true;
 		try {
 			toast.loading('Deleting...');
-			await categories.deleteCategory(currentCategory.id);
+			await categories.deleteCategory(currentCategoryId);
 			toast.success('Successfully deleted category');
 		} catch (err) {
 			toast.error(err.message);
@@ -61,13 +68,22 @@
 			isDeletingCategory = false;
 			isDeleteAlertDialogOpen = false;
 
-			currentCategory = $categories[0];
+			currentCategoryId = 1;
 		}
 	}
+
+	let showCompleted = $state(readShowCompleted());
+
+	$effect(() => {
+		setShowCompleted(showCompleted);
+	});
+
+	let workspace = $state(page.data.workspace);
 </script>
 
+<SseHandler bind:workspace={workspace} bind:currentCategoryId={currentCategoryId} {currentCategory} />
 <div class="p-5">
-	<NoteTopBar {currentCategory} />
+	<NoteTopBar {workspace} {currentCategory} />
 
 	<hr class="border border-gray-500 mb-5" />
 
@@ -76,13 +92,13 @@
 	{:else if errors?.length > 0}
 		<p class="text-red-600">{errors}</p>
 	{:else}
-		<Tabs value={currentCategoryLabel}>
+		<Tabs value={currentCategory.label}>
 			<TabsList class="bg-primary/10">
-				{#each $categories.filter((category) => category.label !== 'completed') as category (category.label)}
+				{#each $categories.filter((category) => category.label !== 'completed') as category (category.id)}
 					<TabsTrigger value={category.label}
 											 onclick={() => changeTab(category)}>
 						{toTitleCase(category.label)}
-						{#if currentCategoryLabel === category.label && category.label !== 'to-dos'}
+						{#if currentCategoryId === category.id && category.label !== 'to-dos'}
 							<span class="ms-1">
 								<Button size="icon" variant="ghost" class="text-blue-500" onclick={
 									() => {isEditDialogOpen = !isEditDialogOpen}
@@ -102,7 +118,7 @@
 									noClose={true}
 									title="Add new category"
 									description="Add new category to keep your notes neatly sorted!">
-						<CategoryForm bind:open={isDialogOpen} bind:currentCategory={currentCategory} />
+						<CategoryForm bind:open={isDialogOpen} bind:currentCategoryId={currentCategoryId} />
 					</Dialog>
 				{/if}
 				<TabsTrigger value='completed'
@@ -110,11 +126,15 @@
 					Completed
 				</TabsTrigger>
 			</TabsList>
-			<TabsContent value={currentCategoryLabel}>
+			<span class="flex items-center space-x-2">
+				<Switch id="show-completed" bind:checked={showCompleted} />
+				<Label for="show-completed" class="cursor-pointer">Show completed</Label>
+			</span>
+			<TabsContent value={currentCategory.label}>
 				{#if currentCategory.description}
 					<p class="text-primary/77 italic">{currentCategory.description}</p>
 				{/if}
-				<NotesMasonry searchCategoryParam={currentCategoryLabel} />
+				<NotesMasonry {showCompleted} searchCategoryParam={currentCategory.label} />
 			</TabsContent>
 		</Tabs>
 	{/if}
@@ -123,7 +143,7 @@
 {#if isEditDialogOpen}
 	<Dialog bind:open={isEditDialogOpen}
 					noClose={true}
-					title="Edit {currentCategoryLabel}"
+					title="Edit {currentCategory.label}"
 					description="Add or edit the description">
 		<CategoryForm bind:open={isEditDialogOpen} category={currentCategory} />
 	</Dialog>

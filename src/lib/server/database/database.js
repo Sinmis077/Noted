@@ -15,7 +15,7 @@ if (dir !== '.') {
 	mkdirSync(dir, { recursive: true });
 }
 
-console.log('Initializing database...');
+logger.info('Initializing database...');
 
 const db = new Database(dbPath, {
 	verbose: dev

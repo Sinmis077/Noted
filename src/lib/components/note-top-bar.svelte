@@ -23,13 +23,10 @@
 	import { toast } from 'svelte-sonner';
 	import { LogOut, Paintbrush, PenLine } from 'lucide-svelte';
 	import { Spinner } from '$lib/components/ui/spinner/index.js';
-	import { page } from '$app/state';
 
 	let newNoteText = $state('');
 
-	const { workspace } = page.data;
-
-	let { currentCategory } = $props();
+	let { currentCategory, workspace } = $props();
 
 	let isDialogOpen = $state(false);
 	let isDeleting = $state(false);
@@ -37,7 +34,7 @@
 	let isEditingDescription = $state(false);
 	let isSavingDescription = $state(false);
 
-	let description = $state(workspace.description);
+	let description = $derived(workspace.description);
 	let password = $state(null);
 
 	async function handleNewNote(event) {

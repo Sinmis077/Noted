@@ -51,7 +51,13 @@ function createNotesStore() {
 
 			const { data } = await api.post('/notes', newNote);
 
-			update((notes) => [...notes, data]);
+			update((notes) => {
+				if (notes.find((existingNote) => existingNote.id === data.id)) {
+					return notes;
+				}
+
+				return [...notes, data];
+			});
 		},
 
 		editNote: async (note) => {
@@ -91,9 +97,37 @@ function createNotesStore() {
 		clearAll: async () => {
 			await api.delete(`/notes`);
 
-			update(() => {
-				return [];
+			update(() => []);
+		},
+
+		addSSENote: (note) => {
+			update((notes) => {
+				if (notes.find((existingNote) => existingNote.id === note.id)) {
+					return notes;
+				}
+
+				return [...notes, note]}
+			);
+		},
+
+		updateSSENote(note) {
+			update((notes) => {
+				return notes.map((existingNote) => (existingNote.id === note.id ? note : existingNote));
 			});
+		},
+
+		deleteSSENote(id) {
+			update((notes) => {
+				if (!notes.find((existingNote) => existingNote.id === id)) {
+					return notes;
+				}
+
+				return notes.filter((existingNote) => existingNote.id !== id);
+			});
+		},
+
+		clearAllSSENotes() {
+			update(() => []);
 		}
 	};
 }

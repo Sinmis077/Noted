@@ -105,9 +105,9 @@ export function getNotesByPassphraseAndCategory(passphrase, category) {
 }
 
 export function saveNote(passphrase, note) {
-	note.category = note.category?.label ?? note.category;
+	note.category = note.category?.id ?? note.category;
 
-	if (note.category === 'to-dos' || note.category === 'completed') {
+	if (note.category === 1 || note.category === 2) {
 		note.category = null;
 	}
 

@@ -1,18 +1,19 @@
-const STORAGE_KEY = 'notes-app-data';
+import { toast } from 'svelte-sonner';
 
-export function saveNotes(notes) {
+const SHOW_COMPLETED_KEY = 'NOTED_SHOW_COMPLETED'
+
+export function setShowCompleted(state) {
 	try {
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+		localStorage.setItem(SHOW_COMPLETED_KEY, JSON.stringify(state));
 	} catch (error) {
-		console.error('Failed to save notes to local storage: ', error);
+		toast.error(error);
 	}
 }
 
-export function getNotes() {
+export function readShowCompleted() {
 	try {
-		return JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? [];
+		return JSON.parse(localStorage.getItem(SHOW_COMPLETED_KEY));
 	} catch (error) {
-		console.error('Failed to get notes from local storage: ', error);
-		return [];
+		toast.error(error);
 	}
 }

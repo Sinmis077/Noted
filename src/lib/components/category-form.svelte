@@ -13,25 +13,28 @@
 	let label = $state(null);
 	let description = $state(category?.description);
 
-	let { open = $bindable(true), currentCategory = $bindable({}), category } = $props();
+	let { open = $bindable(true), currentCategoryId = $bindable({}), category } = $props();
 
 	async function handleSubmit() {
 		try {
+			let cat = null;
 			if (category) {
-				await categories.editCategory({
+					cat = await categories.editCategory({
 					...category,
 					description: description
 				});
 
 				toast.success(`${category.label} updated!`);
 			} else {
-				 currentCategory = await categories.addCategory({
+				cat = await categories.addCategory({
 					label: label,
 					description: description
 				});
 
 				toast.success('Category added!');
 			}
+
+			currentCategoryId = cat.id;
 		} catch (err) {
 			toast.error(err.message);
 		} finally {
