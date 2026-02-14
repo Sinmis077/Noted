@@ -8,7 +8,7 @@ export function POST({ locals: { sessionId, workspace } }) {
 
 	return produce(
 		async function start({ emit }) {
-			logger.debug('SSE connection established');
+			logger.debug(`SSE connection established for session ${sessionId}`);
 
 			const { error } = emit('health', 'ok');
 
@@ -18,7 +18,7 @@ export function POST({ locals: { sessionId, workspace } }) {
 
 			let existingMap = clients.get(workspace.passphrase);
 
-			if(existingMap) {
+			if (existingMap) {
 				existingMap.set(sessionId, emit);
 
 				clients.set(workspace.passphrase, existingMap);
@@ -36,9 +36,15 @@ export function POST({ locals: { sessionId, workspace } }) {
 
 				connectedClients.delete(sessionId);
 
-				if(connectedClients.size === 0) {
+				if (connectedClients.size === 0) {
 					clients.delete(workspace.passphrase);
 				}
+			},
+			headers: {
+				'cache-control': 'no-store, no-transform',
+				'Transfer-Encoding': 'chunked',
+				'X-Accel-Buffering': 'no',
+				'CF-Cache-Status': 'DYNAMIC'
 			}
 		}
 	);

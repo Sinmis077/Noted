@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { logger } from '$lib/server/logger.js';
 
 // 256+ bit secret and expiry in milliseconds
 const jwtSecret = process.env.JWT_SECRET;
@@ -25,7 +26,8 @@ export function extractPayload(token) {
 			issuer: 'Noted'
 		});
 	} catch (err) {
-		console.error(err);
+		logger.warn("JWT verification failed, either token expired or had a different JWT secret sign it");
+		logger.warn(err);
 		return null;
 	}
 }

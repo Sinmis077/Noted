@@ -5,7 +5,7 @@ import { extractPayload } from '$lib/server/services/jws.service.js';
 import { logger } from '$lib/server/logger.js';
 import { randomUUID } from 'node:crypto';
 
-logger.info(`Starting Noted version ${process.env.npm_package_version}`);
+logger.info(`Starting Noted version ${process.env.npm_package_version ?? '1.2.1 (Apple Pie)'}`);
 logger.info('Starting backend api...');
 logger.info('Backend API started');
 
@@ -42,6 +42,8 @@ export async function handle({ event, resolve }) {
 	logger.trace(`The token payload is ${JSON.stringify(payload)}`);
 
 	if (!payload) {
+		event.cookies.delete('noted-authentication', { path: '/' });
+
 		if(event.url.pathname.startsWith('/api')) {
 			throw error(403, "You are unauthorized");
 		} else throw redirect(303, '/');
