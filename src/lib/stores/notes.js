@@ -56,7 +56,7 @@ function createNotesStore() {
 					return notes;
 				}
 
-				return [...notes, data];
+				return [data, ...notes];
 			});
 		},
 
@@ -106,8 +106,8 @@ function createNotesStore() {
 					return notes;
 				}
 
-				return [...notes, note]}
-			);
+				return [note, ...notes];
+			});
 		},
 
 		updateSSENote(note) {

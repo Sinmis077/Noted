@@ -9,7 +9,12 @@
 	function resize(node) {
 
 		const calculateRowSpan = () => {
-			rowSpan = Math.ceil((node.scrollHeight + GAP) / (ROW_HEIGHT + GAP));
+			let mathematicalHeight = node.scrollHeight + GAP;
+			if(mathematicalHeight >= node.offsetWidth) {
+				rowSpan = Math.ceil(mathematicalHeight / (ROW_HEIGHT + GAP));
+			} else {
+				rowSpan = Math.ceil(node.offsetWidth / (ROW_HEIGHT + GAP));
+			}
 		};
 
 		calculateRowSpan();
