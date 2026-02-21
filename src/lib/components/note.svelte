@@ -92,7 +92,7 @@
 	}
 </script>
 
-<Card {@attach resize} class="fade-in h-full text-gray-900 {note.backgroundColor}">
+<Card {@attach resize} class="fade-in h-full text-gray-900 {note.backgroundColor}" data-slot="note">
 	<CardHeader>
 		<CardAction>
 			<div class="flex flex-row gap-2 items-center">
@@ -143,9 +143,9 @@
 	<CardContent>
 		{#if isEditing}
 			<form onsubmit={handleEditNote} class="w-full" noValidate>
-				<InputGroup class="bg-white/70 dark:bg-white/70">
+				<InputGroup class="h-auto bg-white/70 dark:bg-white/70">
 					<Textarea
-						class="field-sizing-content bg-white flex min-h-20 w-full resize-none rounded-md px-3 py-2.5 text-base outline-none transition-[color,box-shadow] md:text-sm"
+						class="field-sizing-content h-auto bg-white flex rounded-md px-3 py-2.5 text-base outline-none transition-[color,box-shadow] md:text-sm"
 						data-slot="input-group-control"
 						autosize={true}
 						bind:value={editingNoteText}
@@ -161,21 +161,23 @@
 			<p class:line-through={note.isCompleted} class="wrap-break-word whitespace-pre-wrap">{note.text}</p>
 		{/if}
 	</CardContent>
-	<CardFooter class="flex flex-col gap-1 mt-auto">
-		<Popover>
-			<PopoverTrigger class="ms-auto">
-				{#if note.isCompleted}
-					<CircleCheck />
-				{:else}
-					<InfoIcon />
-				{/if}
-			</PopoverTrigger>
-			<PopoverContent>
-				Created on: {formatDate(note.createdAt)} <br />
-				{#if note.isCompleted}
-					Completed on: {formatDate(note.completedAt)}
-				{/if}
-			</PopoverContent>
-		</Popover>
-	</CardFooter>
+	{#if !isEditing}
+		<CardFooter class="flex flex-col gap-1 mt-auto">
+			<Popover>
+				<PopoverTrigger class="ms-auto">
+					{#if note.isCompleted}
+						<CircleCheck />
+					{:else}
+						<InfoIcon />
+					{/if}
+				</PopoverTrigger>
+				<PopoverContent>
+					Created on: {formatDate(note.createdAt)} <br />
+					{#if note.isCompleted}
+						Completed on: {formatDate(note.completedAt)}
+					{/if}
+				</PopoverContent>
+			</Popover>
+		</CardFooter>
+	{/if}
 </Card>
